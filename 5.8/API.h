@@ -9,6 +9,10 @@ namespace Dijkstra {
     // args:   int city_id
     void newCity(int);
 
+    // desp:   delete a existing city
+    // args:   int city_id
+    void delCity(int);
+
     // desp:   create a new route
     // args:   int route_id
     // args:   ROUTE_TYPE route_type
@@ -18,6 +22,10 @@ namespace Dijkstra {
     // args:   int duration
     // args:   int cost
     void newRoute(int, ROUTE_TYPE, int, int, int, int, int);
+
+    // desp:   delete a existing route
+    // args:   int route_id
+    void delRoute(int);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
@@ -32,6 +40,10 @@ namespace DP {
     // args:   int city_id
     void newCity(int);
 
+    // desp:   delete a existing city
+    // args:   int city_id
+    void delCity(int);
+
     // desp:   create a new route
     // args:   int route_id
     // args:   ROUTE_TYPE route_type
@@ -41,6 +53,10 @@ namespace DP {
     // args:   int duration
     // args:   int cost
     void newRoute(int, ROUTE_TYPE, int, int, int, int, int);
+
+    // desp:   delete a existing route
+    // args:   int route_id
+    void delRoute(int);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
