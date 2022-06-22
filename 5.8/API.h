@@ -30,9 +30,10 @@ namespace Dijkstra {
     // desp:   find path that matches policy
     // args:   int departure_city_id
     // args:   int arrival_city_id
+    // args:   ROUTE_TYPE route_type
     // args:   POLICY_TYPE policy
     // return: std::vector<int> sequence of [route_id] in the path
-    std::vector<int> search(int, int, POLICY_TYPE);
+    std::vector<int> search(int, int, ROUTE_TYPE, POLICY_TYPE);
 }
 
 namespace DP {
@@ -61,9 +62,10 @@ namespace DP {
     // desp:   find path that matches policy
     // args:   int departure_city_id
     // args:   int arrival_city_id
+    // args:   ROUTE_TYPE route_type
     // args:   POLICY_TYPE policy
     // return: std::vector<int> sequence of [route_id] in the path
-    std::vector<int> search(int, int, POLICY_TYPE);
+    std::vector<int> search(int, int, ROUTE_TYPE, POLICY_TYPE);
 }
 
 #endif
