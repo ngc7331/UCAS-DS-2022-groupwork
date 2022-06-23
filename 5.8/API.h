@@ -25,7 +25,8 @@ namespace Dijkstra {
 
     // desp:   delete a existing route
     // args:   int route_id
-    void delRoute(int);
+    // args:   ROUTE_TYPE route_type
+    void delRoute(int, ROUTE_TYPE);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
@@ -57,7 +58,8 @@ namespace DP {
 
     // desp:   delete a existing route
     // args:   int route_id
-    void delRoute(int);
+    // args:   ROUTE_TYPE route_type
+    void delRoute(int, ROUTE_TYPE);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
