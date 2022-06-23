@@ -17,4 +17,11 @@ typedef enum {
     INTERCHANGE  // 最少换乘
 } POLICY_TYPE;   // 搜索策略类型
 
+typedef enum {
+    OK,            // 成功
+    ERR_VALUE,     // 传入无效的参数
+    ERR_ASSERTION, // 断言失败
+    ERR            // 其余错误
+} Status;          // 函数状态码（参考Python的Exception设计）
+
 #endif
