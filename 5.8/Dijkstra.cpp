@@ -44,7 +44,8 @@ std::vector<int> searchMinInterchange(int startCity, int endCity, ROUTE_TYPE rou
 
 // desp:   create a new city
 // args:   int city_id
-void Dijkstra::newCity(int cityID)
+// return: Status code
+Status Dijkstra::newCity(int cityID)
 {
     if (cityID >= 0)
     {
@@ -52,19 +53,24 @@ void Dijkstra::newCity(int cityID)
             Map.city.resize(cityID + 10);
         Map.city[cityID].existence = true;
         Map.cityNum++; 
+        return OK;
     }
+    return ERR_VALUE;
 }
 
 // desp:   delete a existing city
 // args:   int city_id
-void Dijkstra::delCity(int cityID)
+// return: Status code
+Status Dijkstra::delCity(int cityID)
 {
     if (cityID >= 0 && cityID < Map.city.size())
     {
         Map.city[cityID].existence = false;
         Map.cityNum--;
         //边没有被删除，在后续遍历时，如果遇到非法边，再删除。
+        return OK;
     }
+    return ERR_VALUE;
 }
 
 // desp:   create a new route
@@ -75,7 +81,8 @@ void Dijkstra::delCity(int cityID)
 // args:   int departure_time
 // args:   int duration
 // args:   int cost
-void Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int stratTime, int endTime, int cost)
+// return: Status code
+Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int stratTime, int endTime, int cost)
 {
     if (startCityID >= Map.city.size() || Map.city[startCityID].existence == false)
         newCity(startCityID);
@@ -92,7 +99,7 @@ void Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int 
         for (p = Map.city[startCityID].first; p->next; p = p->next)
         {
             if (p->edgeInfo.routeID == routeID && p->edgeInfo.routeType == routeType)
-                return; //边已经存在
+                return ERR_VALUE; //边已经存在
         }
         p->next = new NodeLink;
         p = p->next;
@@ -106,12 +113,14 @@ void Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int 
     p->edgeInfo.endTime = endTime;
     p->edgeInfo.cost = cost;
     p->next = nullptr;
+    return OK;
 }
 
 // desp:   delete a existing route
 // args:   int route_id
 // args:   ROUTE_TYPE route_type
-void Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
+// return: Status code
+Status Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
 {
     NodeLink *bp, *p;
     for (auto startCity : Map.city) //遍历Map中的city
@@ -126,7 +135,7 @@ void Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
                     {
                         bp->next = p->next;
                         delete p;
-                        return;
+                        return OK;
                     }
                     bp = p;
                     p = p->next;
@@ -134,6 +143,7 @@ void Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
             }
         }
     }
+    return ERR_VALUE;
 }
 
 // desp:   find path that matches policy

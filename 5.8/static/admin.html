@@ -3,8 +3,81 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>Admin Page</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     </head>
     <body>
         <h1>Admin Page</h1>
+        <div id="app">
+            <table>
+                <tr><th>序号</th><th>城市名</th><th>操作</th></tr>
+                <tr v-for="(c, i) in city">
+                    <td>{{ i }}</td>
+                    <td>{{ c }}</td>
+                    <td><button v-on:click="delCity(i)">删除</button></td>
+                </tr>
+                <tr>
+                    <td> {{ city.length }} </td>
+                    <td><input v-model="new_city" type="text" placeholder="请输入城市名"></td>
+                    <td><button v-on:click="newCity()">创建</button></td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer">
+            <a href="/user">用户模式</a>
+        </div>
     </body>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    new_city: "",
+                    city: []
+                }
+            },
+            mounted () {
+                let app = this;
+                app.loadData(app.city, "data/city.json");
+            },
+            methods: {
+                clearData: function() {
+                    this.city = [];
+                },
+                loadData: function(target, url) {
+                    console.log("load data from " + url);
+                    return new Promise((resolve, reject)=>{
+                        axios.get(url)
+                            .then(response => {
+                                this.copyObject(response.data, target);
+                                resolve();
+                            })
+                            .catch(function (error) { console.log(error); reject(); });
+                    })
+                },
+                newCity: function(i) {
+                    axios.get("api/v1/newCity?name=" + this.new_city)
+                        .then(response => {
+                            this.city[this.city.length] = this.new_city;
+                            resolve();
+                        })
+                        .catch(function (error) { console.log(error); reject(); });
+                },
+                delCity: function(i) {
+                    axios.get("api/v1/delCity?id=" + i)
+                        .then(response => {
+                            delete this.city[i];
+                            resolve();
+                        })
+                        .catch(function (error) { console.log(error); reject(); });
+                },
+                copyObject: function(from, to) {
+                    for (var key in from) {
+                        to[key] = from[key];
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
 </html>

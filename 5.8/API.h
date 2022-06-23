@@ -1,17 +1,57 @@
 #ifndef __TQ_API
 #define __TQ_API
 
-#include <vector>
 #include "type.h"
+#include <vector>
+#include <string>
+
+namespace API {
+    // desp:   create a new city
+    // args:   std::string name
+    // return: Status code
+    Status newCity(std::string);
+
+    // desp:   delete a existing city
+    // args:   int city_id
+    // return: Status code
+    Status delCity(int);
+
+    // desp:   create a new route
+    // args:   std::string name
+    // args:   ROUTE_TYPE route_type
+    // args:   int departure_city_id
+    // args:   int arrival_city_id
+    // args:   int departure_time
+    // args:   int duration
+    // args:   int cost
+    // return: Status code
+    Status newRoute(std::string, ROUTE_TYPE, int, int, int, int, int);
+
+    // desp:   delete a existing route
+    // args:   int route_id
+    // args:   ROUTE_TYPE route_type
+    // return: Status code
+    Status delRoute(int, ROUTE_TYPE);
+
+    // desp:   find path that matches policy
+    // args:   int departure_city_id
+    // args:   int arrival_city_id
+    // args:   ROUTE_TYPE route_type
+    // args:   POLICY_TYPE policy
+    // return: std::vector<int> sequence of [route_id] in the path
+    std::vector<int> search(int, int, ROUTE_TYPE, POLICY_TYPE);
+}
 
 namespace Dijkstra {
     // desp:   create a new city
     // args:   int city_id
-    void newCity(int);
+    // return: Status code
+    Status newCity(int);
 
     // desp:   delete a existing city
     // args:   int city_id
-    void delCity(int);
+    // return: Status code
+    Status delCity(int);
 
     // desp:   create a new route
     // args:   int route_id
@@ -21,12 +61,14 @@ namespace Dijkstra {
     // args:   int departure_time
     // args:   int duration
     // args:   int cost
-    void newRoute(int, ROUTE_TYPE, int, int, int, int, int);
+    // return: Status code
+    Status newRoute(int, ROUTE_TYPE, int, int, int, int, int);
 
     // desp:   delete a existing route
     // args:   int route_id
     // args:   ROUTE_TYPE route_type
-    void delRoute(int, ROUTE_TYPE);
+    // return: Status code
+    Status delRoute(int, ROUTE_TYPE);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
@@ -40,11 +82,13 @@ namespace Dijkstra {
 namespace DP {
     // desp:   create a new city
     // args:   int city_id
-    void newCity(int);
+    // return: Status code
+    Status newCity(int);
 
     // desp:   delete a existing city
     // args:   int city_id
-    void delCity(int);
+    // return: Status code
+    Status delCity(int);
 
     // desp:   create a new route
     // args:   int route_id
@@ -54,12 +98,14 @@ namespace DP {
     // args:   int departure_time
     // args:   int duration
     // args:   int cost
-    void newRoute(int, ROUTE_TYPE, int, int, int, int, int);
+    // return: Status code
+    Status newRoute(int, ROUTE_TYPE, int, int, int, int, int);
 
     // desp:   delete a existing route
     // args:   int route_id
     // args:   ROUTE_TYPE route_type
-    void delRoute(int, ROUTE_TYPE);
+    // return: Status code
+    Status delRoute(int, ROUTE_TYPE);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
