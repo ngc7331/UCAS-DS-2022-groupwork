@@ -48,6 +48,8 @@ void Dijkstra::newCity(int cityID)
 {
     if (cityID >= 0)
     {
+        if (cityID >= Map.city.size())
+            Map.city.resize(cityID + 10);
         Map.city[cityID].existence = true;
         Map.cityNum++; 
     }
@@ -57,7 +59,7 @@ void Dijkstra::newCity(int cityID)
 // args:   int city_id
 void Dijkstra::delCity(int cityID)
 {
-    if (cityID >= 0 && cityID < Map.city.max_size())
+    if (cityID >= 0 && cityID < Map.city.size())
     {
         Map.city[cityID].existence = false;
         Map.cityNum--;
@@ -75,9 +77,9 @@ void Dijkstra::delCity(int cityID)
 // args:   int cost
 void Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int stratTime, int endTime, int cost)
 {
-    if (Map.city[startCityID].existence == false)
+    if (startCityID >= Map.city.size() || Map.city[startCityID].existence == false)
         newCity(startCityID);
-    if (Map.city[endCityID].existence == false)
+    if (endCityID >= Map.city.size() || Map.city[endCityID].existence == false)
         newCity(endCityID);
 
     NodeLink *p;
