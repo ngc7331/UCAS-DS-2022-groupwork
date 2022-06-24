@@ -1,7 +1,8 @@
-#include <iostream>
 #include <crow/app.h>
-#include "server.h"
+#include <iostream>
 #include "API.h"
+#include "const.h"
+#include "server.h"
 
 #define assertParam(key) \
 if (!req.url_params.get(#key)) \
@@ -10,9 +11,6 @@ else \
 
 #define getParamString(key) assertParam(key) key = req.url_params.get(#key)
 #define getParamInt(key) assertParam(key) key = atoi(req.url_params.get(#key))
-
-#define STATIC_FILE_PATH "static/"
-#define DATA_PATH "data/"
 
 Server::Server() {
     /* --- root --- */
@@ -47,14 +45,18 @@ Server::Server() {
         std::string name;
         getParamString(name);
         Status code = API::newCity(name);
-        return Server::respond(code, "City Created", code==OK?"":"Error: code " + std::to_string(code));
+        return Server::respond(
+            code,
+            "City Created",
+            code==ERR_VALUE ? "City" + name + "already existed" : "Internal Server Error, see log"
+        );
     });
 
     CROW_ROUTE(app, "/api/v1/delCity")([](const crow::request& req) {
         int id;
         getParamInt(id);
         Status code = API::delCity(id);
-        return Server::respond(code, "City Deleted", code==OK?"":"Error: code " + std::to_string(code));
+        return Server::respond(code, "City Deleted", "No such city");
     });
 
     /* --- DEMO --- */
@@ -98,8 +100,8 @@ crow::response Server::respond(Status code, std::string msg, std::string err) {
 
     crow::json::wvalue body;
     body["code"] = code;
-    body["msg"] = msg;
-    body["err"] = err;
+    body["msg"] = code == OK ? msg : "";
+    body["err"] = code == OK ? "" : err;
     resp.body = body.dump();
 
     resp.set_header("content-type", "application/json");

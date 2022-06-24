@@ -1,17 +1,29 @@
 #include <iostream>
-#include "type.h"
+#include "API.h"
+#include "const.h"
 #include "server.h"
+#include "type.h"
 
-// use "extern ALGO_TYPE algorithm" in other files
+void help();
+
+// use "extern" in other files
 ALGO_TYPE algorithm;
+std::map<int, std::string> city_list;
+std::map<int, std::string> train_list;
+std::map<int, std::string> plane_list;
 
 int main(int argc, char **argv) {
-    void help();
-    Server server;
-
-    // default settings
+    // init data
     enum {TERMINAL, SERVER} intr_mode = TERMINAL;
+    Server server;
     algorithm = ALGO_DP;
+    city_list = API::loadFile(DATA_PATH "city.json");
+    train_list = API::loadFile(DATA_PATH "train.json");
+    plane_list = API::loadFile(DATA_PATH "plane.json");
+    for (auto &iter : city_list) {
+        // DP::newCity(iter.first);
+        Dijkstra::newCity(iter.first);
+    }
 
     // arg parse
     while (argc --) {

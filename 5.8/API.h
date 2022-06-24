@@ -1,11 +1,34 @@
 #ifndef __TQ_API
 #define __TQ_API
 
-#include "type.h"
-#include <vector>
+#include <map>
 #include <string>
+#include <vector>
+#include "type.h"
 
 namespace API {
+    // desp:   get city id by its name
+    // args:   std::string name
+    // return: int city id
+    int getCityId(std::string);
+
+    // desp:   load a json file
+    // args:   std::string path
+    // return: std::map<int, std::string> json object
+    std::map<int, std::string> loadFile(std::string);
+
+    // desp:   save a json file
+    // args:   std::string path
+    // args:   std::map<int, std::string> json object
+    void saveFile(std::string, std::map<int, std::string>);
+
+    // desp:   check if a and b are the same train
+    // note:   should be called only if ROUTE_TYPE is TRAIN
+    // args:   int route_id a
+    // args:   int route_id b
+    // return: bool
+    bool isSameTrain(int, int);
+
     // desp:   create a new city
     // args:   std::string name
     // return: Status code
