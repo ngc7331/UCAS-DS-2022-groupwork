@@ -20,7 +20,13 @@ namespace API {
     // desp:   save a json file
     // args:   std::string path
     // args:   std::map<int, std::string> json object
-    void saveFile(std::string, std::map<int, std::string>);
+    // return: Status code
+    Status saveFile(std::string, std::map<int, std::string>);
+
+    // desp:   set algorithm
+    // args:   ALGO_TYPE type
+    // return: Status code
+    Status setAlgo(int);
 
     // desp:   check if a and b are the same train
     // note:   should be called only if ROUTE_TYPE is TRAIN
@@ -48,13 +54,13 @@ namespace API {
     // args:   int duration
     // args:   int cost
     // return: Status code
-    Status newRoute(std::string, ROUTE_TYPE, int, int, int, int, int);
+    Status newRoute(std::string, int, int, int, int, int, int);
 
     // desp:   delete a existing route
     // args:   int route_id
     // args:   ROUTE_TYPE route_type
     // return: Status code
-    Status delRoute(int, ROUTE_TYPE);
+    Status delRoute(int, int);
 
     // desp:   find path that matches policy
     // args:   int departure_city_id
@@ -62,7 +68,7 @@ namespace API {
     // args:   ROUTE_TYPE route_type
     // args:   POLICY_TYPE policy
     // return: std::vector<int> sequence of [route_id] in the path
-    std::vector<int> search(int, int, ROUTE_TYPE, POLICY_TYPE);
+    std::vector<int> search(int, int, int, int);
 }
 
 namespace Dijkstra {
