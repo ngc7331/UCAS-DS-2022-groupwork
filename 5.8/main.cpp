@@ -1,3 +1,4 @@
+#include <crow/json.h>
 #include <iostream>
 #include "API.h"
 #include "const.h"
@@ -26,6 +27,18 @@ int main(int argc, char **argv) {
         // DP::newCity(iter.first);
         Dijkstra::newCity(iter.first);
     }
+    for (auto &iter : train_list) {
+        crow::json::rvalue r = crow::json::load(iter.second);
+        int a = r[1].i(), b = r[2].i(), t = r[3].i(), d = r[4].i(), c = r[5].i();
+        // DP::newRoute(iter.first, TRAIN, a, b, t, d, c);
+        Dijkstra::newRoute(iter.first, TRAIN, a, b, t, d, c);
+    }
+    for (auto &iter : plane_list) {
+        crow::json::rvalue r = crow::json::load(iter.second);
+        int a = r[1].i(), b = r[2].i(), t = r[3].i(), d = r[4].i(), c = r[5].i();
+        // DP::newRoute(iter.first, TRAIN, a, b, t, d, c);
+        Dijkstra::newRoute(iter.first, TRAIN, a, b, t, d, c);
+    }
 
     // arg parse
     while (++argv, --argc) {
@@ -48,9 +61,16 @@ int main(int argc, char **argv) {
         }
     }
 
+    std::vector<int> a;
     switch (intr_mode) {
     case TERMINAL:
         std::cout << "你启用了尚未完成的终端模式orz" << std::endl;
+        // DEBUG:
+        algorithm = ALGO_DIJK;
+        a = API::search(0, 2, PLANE, COST);
+        for (auto iter : a) {
+            std::cout << iter << std::endl;
+        }
         break;
     case SERVER:
         server.run();
