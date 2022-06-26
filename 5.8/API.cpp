@@ -45,7 +45,19 @@ std::map<int, std::string> API::loadFile(std::string path) {
 }
 
 void API::saveFile(std::string path, std::map<int, std::string> src) {
-    // TODO
+    std::ofstream wf(path);
+    std::stringstream buffer;
+    buffer << "{" << std::endl;
+    for (auto iter=src.begin(); iter!=src.end(); ) {
+        buffer << "    \"" << iter->first << "\": ";
+        crow::json::wvalue w = iter->second;
+        buffer << w.dump();
+        if (++iter != src.end())
+            buffer << ",";
+        buffer << std::endl;
+    }
+    buffer << "}" << std::endl;
+    wf << buffer.str();
 }
 
 bool API::isSameTrain(int a, int b) {
@@ -74,5 +86,5 @@ Status API::delCity(int id) {
     city_list.erase(id);
     API::saveFile(DATA_PATH "city.json", city_list);
     // call
-    return Dijkstra::newCity(id)==OK /* && DP::newCity(id)==OK */ ? OK : ERR;
+    return Dijkstra::delCity(id)==OK /* && DP::delCity(id)==OK */ ? OK : ERR;
 }
