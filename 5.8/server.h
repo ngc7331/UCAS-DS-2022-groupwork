@@ -9,7 +9,7 @@ class Server {
     private:
         unsigned PORT=8080;
         crow::SimpleApp app;
-        static crow::response respond(Status code, std::string msg, std::string err);
+        static crow::response respond(Status, std::string, std::string, std::string);
     public:
         Server();
         void run();

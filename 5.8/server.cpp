@@ -47,6 +47,7 @@ Server::Server() {
         Status code = API::newCity(name);
         return Server::respond(
             code,
+            "",
             "City Created",
             code==ERR_VALUE ? "City" + name + "already existed" : "Internal Server Error, see log"
         );
@@ -56,7 +57,46 @@ Server::Server() {
         int id;
         getParamInt(id);
         Status code = API::delCity(id);
-        return Server::respond(code, "City Deleted", "No such city");
+        return Server::respond(code, "", "City Deleted", "No such city");
+    });
+
+    CROW_ROUTE(app, "/api/v1/newRoute")([](const crow::request& req) {
+        std::string name;
+        getParamString(name);
+        int tp, a, b, t, d, c;
+        getParamInt(tp);
+        getParamInt(a);
+        getParamInt(b);
+        getParamInt(t);
+        getParamInt(d);
+        getParamInt(c);
+        Status code = API::newRoute(name, tp, a, b, t, d, c);
+        return Server::respond(code, "", "Route created", "");
+    });
+
+    CROW_ROUTE(app, "/api/v1/delRoute")([](const crow::request& req) {
+        int id, tp;
+        getParamInt(id);
+        getParamInt(tp);
+        Status code = API::delRoute(id, tp);
+        return Server::respond(code, "", "Route deleted", "");
+    });
+
+    CROW_ROUTE(app, "/api/v1/setAlgo")([](const crow::request& req) {
+        int tp;
+        getParamInt(tp);
+        Status code = API::setAlgo(tp);
+        return Server::respond(code, "", "Success", "");
+    });
+
+    CROW_ROUTE(app, "/api/v1/search")([](const crow::request& req) {
+        int a, b, tp, policy;
+        getParamInt(a);
+        getParamInt(b);
+        getParamInt(tp);
+        getParamInt(policy);
+        std::vector<int> res = API::search(a, b, tp, policy);
+        return Server::respond(OK, "", "", "");
     });
 
     /* --- DEMO --- */
@@ -86,7 +126,7 @@ void Server::setPort(unsigned port) {
     Server::PORT = port;
 }
 
-crow::response Server::respond(Status code, std::string msg, std::string err) {
+crow::response Server::respond(Status code, std::string data, std::string msg, std::string err) {
     crow::response resp;
 
     switch (code) {
@@ -100,6 +140,7 @@ crow::response Server::respond(Status code, std::string msg, std::string err) {
 
     crow::json::wvalue body;
     body["code"] = code;
+    body["data"] = data;
     body["msg"] = code == OK ? msg : "";
     body["err"] = code == OK ? "" : err;
     resp.body = body.dump();
