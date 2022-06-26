@@ -98,9 +98,9 @@ Status Dijkstra::delCity(int cityID)
 // args:   int duration
 // args:   int cost
 // return: Status code
-Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int startTime, int endTime, int cost)
+Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int startTime, int duration, int cost)
 {
-    std::cout << "newRoute() called: " << routeID << " " << routeType << " " << startCityID << " " << endCityID << " " << startTime << " " << endTime << " " << cost << std::endl;
+    std::cout << "newRoute() called: " << routeID << " " << routeType << " " << startCityID << " " << endCityID << " " << startTime << " " << duration << " " << cost << std::endl;
     if (startCityID < 0 || endCityID < 0)
         return ERR_VALUE; //输入边不合法
 
@@ -134,7 +134,7 @@ Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, in
     p->routeInfo.startCityIndex = startCityID;
     p->routeInfo.startTime = startTime;
     p->routeInfo.endCityIndex = endCityID;
-    p->routeInfo.endTime = endTime;
+    p->routeInfo.endTime = duration + startTime;
     p->routeInfo.cost = cost;
     p->next = nullptr;
     return OK;
@@ -236,6 +236,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                     if (searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
                         minCost[i] = searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
+                        std::cout << "updata minCost[i] = " << minCost[i] << std::endl;
                         q.push(std::make_pair(minCost[i], p->routeInfo));
                     }
                 }

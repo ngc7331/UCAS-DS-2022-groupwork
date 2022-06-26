@@ -29,7 +29,7 @@ Dijkstra实现：eurekaw
 
 ## 编译说明
 ```
-$ g++ -lpthread -o output *.cpp
+$ g++ -o output *.cpp -lpthread
 ```
 ### [boost](https://www.boost.org/)
 1. 从官网[下载页](https://www.boost.org/users/download/)下载`.tar.bz2`压缩包
