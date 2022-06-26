@@ -120,10 +120,22 @@ Status API::delCity(int id) {
 
 Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c) {
     ROUTE_TYPE route_type;
+    std::stringstream buffer;
+    buffer << "[\"" << name << "\"," << a << "," << b << "," << t << "," << d << "," << c << "]";
     int id;
     switch(tp) {
-    case 0: route_type = TRAIN; id = newId(1); break;
-    case 1: route_type = PLANE; id = newId(2); break;
+    case 0:
+        route_type = TRAIN;
+        id = newId(1);
+        train_list[id] = buffer.str();
+        API::saveFile(DATA_PATH "train.json", train_list);
+        break;
+    case 1:
+        route_type = PLANE;
+        id = newId(2);
+        plane_list[id] = buffer.str();
+        API::saveFile(DATA_PATH "plane.json", plane_list);
+        break;
     default: return ERR_VALUE;
     }
     // call
