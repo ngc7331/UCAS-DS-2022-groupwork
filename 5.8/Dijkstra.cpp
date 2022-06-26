@@ -1,6 +1,7 @@
 #include "API.h"
 #include <queue>
 #include <utility>
+#include <iostream>
 using namespace Dijkstra;
 
 #define MAXWEIGHT 0XFFFF
@@ -56,6 +57,7 @@ int searchDirectRoute(int startCity, int endCity, ROUTE_TYPE routeType, POLICY_T
 // return: Status code
 Status Dijkstra::newCity(int cityID)
 {
+    std::cout << "newCity() called: " << cityID << std::endl;
     if (cityID >= 0)
     {
         if (cityID >= Map.city.size())
@@ -96,8 +98,9 @@ Status Dijkstra::delCity(int cityID)
 // args:   int duration
 // args:   int cost
 // return: Status code
-Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int stratTime, int endTime, int cost)
+Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int startTime, int endTime, int cost)
 {
+    std::cout << "newRoute() called: " << routeID << " " << routeType << " " << startCityID << " " << endCityID << " " << startTime << " " << endTime << " " << cost << std::endl;
     if (startCityID < 0 || endCityID < 0)
         return ERR_VALUE; //输入边不合法
 
@@ -129,7 +132,7 @@ Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, in
     p->routeInfo.routeID = routeID;
     p->routeInfo.routeType = routeType;
     p->routeInfo.startCityIndex = startCityID;
-    p->routeInfo.startTime = stratTime;
+    p->routeInfo.startTime = startTime;
     p->routeInfo.endCityIndex = endCityID;
     p->routeInfo.endTime = endTime;
     p->routeInfo.cost = cost;
@@ -174,10 +177,15 @@ Status Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
 // return: std::vector<int> sequence of [route_id] in the path
 std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE routeType, POLICY_TYPE decisionKind)
 { //采用堆优化的Dijkstra算法，计算三种情况下的值
-    if (startCityID < 0 || startCityID >= Map.city.size() || endCityID < 0 || endCityID >= Map.city.size())
+    std::cout << "search() called: " << startCityID << " " << endCityID << " " << routeType << " " << decisionKind << std::endl;
+    if (startCityID < 0 || startCityID >= Map.city.size() || endCityID < 0 || endCityID >= Map.city.size()) {
+        std::cout << "err1" << std::endl;
         return std::vector<int>(0); //合法性检查
-    if (!Map.city[startCityID].existence || !Map.city[endCityID].existence || !Map.city[startCityID].first)
+    }
+    if (!Map.city[startCityID].existence || !Map.city[endCityID].existence || !Map.city[startCityID].first) {
+        std::cout << "err2" << std::endl;
         return std::vector<int>(0); //不存在城市或起点城市不存在任何线路
+    }
 
     // 使用优先队列(堆)，内容是pair
     // first 是一个相应的开销， second 是边的全部信息
