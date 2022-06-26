@@ -31,10 +31,23 @@ Dijkstra实现：eurekaw
 ```
 $ g++ -o output main.cpp server.cpp ...
 ```
+### [boost](https://www.boost.org/)
+1. 从官网[下载页](https://www.boost.org/users/download/)下载`.tar.bz2`压缩包
+2. 解压
+3. 进入解压得到的目录并运行安装脚本
+  - 注意：执行`./b2`脚本需要有`/usr/local/`目录的写权限
+```
+$ wget https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.bz2
+$ tar --bzip2 -xf boost_1_79_0.tar.bz2
+$ cd boost_1_79_0
+$ ./bootstrap.sh
+$ ./b2 install
+```
+
 ### [Crow](https://github.com/CrowCpp/Crow)
 1. 从官方仓库 [release](https://github.com/CrowCpp/Crow/releases) 下载`.deb`安装包
 2. 使用`dpkg`安装
 ```
 $ wget https://github.com/CrowCpp/Crow/releases/download/v1.0%2B3/crow-v1.0+3.deb
-$ dpkg -i crow-v1.0+3.deb
+$ sudo dpkg -i crow-v1.0+3.deb
 ```
