@@ -7,8 +7,8 @@ typedef enum {
 } ALGO_TYPE;     // 算法类型
 
 typedef enum {
-    PLANE,       // 飞机
-    TRAIN        // 火车
+    TRAIN,       // 火车
+    PLANE        // 飞机
 } ROUTE_TYPE;    // 路线类型
 
 typedef enum {
