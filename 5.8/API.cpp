@@ -39,7 +39,9 @@ std::map<int, std::string> API::loadFile(std::string path) {
     for (auto key : r.keys()) {
         crow::json::wvalue w = r[key];
         std::string s = w.dump();
-        dst[atoi(key.c_str())] = s.substr(1, s.length()-2);
+        if (s[0] == '"')
+            s = s.substr(1, s.length()-2);
+        dst[atoi(key.c_str())] = s;
     }
     return dst;
 }
@@ -50,8 +52,10 @@ void API::saveFile(std::string path, std::map<int, std::string> src) {
     buffer << "{" << std::endl;
     for (auto iter=src.begin(); iter!=src.end(); ) {
         buffer << "    \"" << iter->first << "\": ";
-        crow::json::wvalue w = iter->second;
-        buffer << w.dump();
+        if (iter->second[0] == '[')
+            buffer << crow::json::load(iter->second);
+        else
+            buffer << "\"" << iter->second << "\"";
         if (++iter != src.end())
             buffer << ",";
         buffer << std::endl;
