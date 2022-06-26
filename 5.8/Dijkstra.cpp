@@ -208,19 +208,21 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
 
     RouteInfo null;                     //用于填充第一个route，无意义
     null.startCityIndex = null.endCityIndex = startCityID;
+    null.cost = null.startTime = null.endTime = 0;
     q.push(std::make_pair(minCost[startCityID], null)); //将起始点放入堆
     while (!q.empty())
     {
         if (visited[endCityID])
             break;
 
-        //队列首是目前所有线路中开销最小的线路
+        //队列首是目前所有线路中开销最小的线路comeRoute
         //相应的，lCity是开销最小就可到达的新城市
-        int lCity = q.top().second.endCityIndex;
+        RouteInfo comeRoute = q.top().second;
+        q.pop();
+        int lCity = comeRoute.endCityIndex;
         if (visited[lCity])
             continue;                          //重复到达该点，跳过
-        routeRecord.push_back(q.top().second); //第一次到达该城市，说明相应边开销最小
-        q.pop();
+        routeRecord.push_back(comeRoute);      //第一次到达该城市，说明相应边开销最小
         visited[lCity] = true; //更新：到达过该城市
 
         //更新以该城市为出发点的其他城市的花费
@@ -231,7 +233,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                 int i = p->routeInfo.endCityIndex;
                 if (decisionKind == TIME)
                 { //在时间函数中，返回值是线路的到达时间，所以不需要累加
-                    if (searchDirectRoute(lCity, i, routeType, decisionKind, p->routeInfo.endTime) < minCost[i])
+                    if (searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
                         minCost[i] = searchDirectRoute(lCity, i, routeType, decisionKind, p->routeInfo.endTime);
                         q.push(std::make_pair(minCost[i], p->routeInfo));
@@ -247,7 +249,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                                 q.push(std::make_pair(minCost[i], p->routeInfo));
                         }
                     }
-                    else if (minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, p->routeInfo.endTime) < minCost[i])
+                    else if (minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
                         minCost[i] = minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, p->routeInfo.endTime);
                         q.push(std::make_pair(minCost[i], p->routeInfo));
