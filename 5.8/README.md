@@ -29,7 +29,7 @@ Dijkstra实现：eurekaw
 
 ## 编译说明
 ```
-$ g++ -o output main.cpp server.cpp ...
+$ g++ -lpthread -o output *.cpp
 ```
 ### [boost](https://www.boost.org/)
 1. 从官网[下载页](https://www.boost.org/users/download/)下载`.tar.bz2`压缩包
@@ -51,3 +51,16 @@ $ ./b2 install
 $ wget https://github.com/CrowCpp/Crow/releases/download/v1.0%2B3/crow-v1.0+3.deb
 $ sudo dpkg -i crow-v1.0+3.deb
 ```
+
+## 运行说明
+```
+./output [--terminal] [--server [--port] <port>] [--help]
+```
+其中
+- `output`为编译得到的可执行文件
+- `--terminal`或无参数的情况下启用终端模式
+- `--server`启用服务器 + webui 模式，默认情况下使用8080端口
+- `--port`指定服务器端口，紧跟`<port>`为端口号，仅在使用`--server`时有效
+- `--help`显示帮助信息并退出
+- 如参数有冲突，例如同时使用`--server`和`--terminal`，将以最后的为准
+- 支持使用首字母缩写，例如`-s`等价于`--server`
