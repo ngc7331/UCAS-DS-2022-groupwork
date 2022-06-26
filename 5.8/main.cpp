@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
     for (auto &iter : plane_list) {
         crow::json::rvalue r = crow::json::load(iter.second);
         int a = r[1].i(), b = r[2].i(), t = r[3].i(), d = r[4].i(), c = r[5].i();
-        // DP::newRoute(iter.first, TRAIN, a, b, t, d, c);
-        Dijkstra::newRoute(iter.first, TRAIN, a, b, t, d, c);
+        // DP::newRoute(iter.first, PLANE, a, b, t, d, c);
+        Dijkstra::newRoute(iter.first, PLANE, a, b, t, d, c);
     }
 
     // arg parse
