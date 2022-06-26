@@ -259,7 +259,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
     {
         if (routeRecord[i].endCityIndex == beforeCityID)
         {
-            beforeCityID == routeRecord[i].startCityIndex;
+            beforeCityID = routeRecord[i].startCityIndex;
             tmpRecord.push_back(routeRecord[i].routeID);
         }
     }
