@@ -1,6 +1,5 @@
 #include "API.h"
 #include <queue>
-#include <utility>
 #include <iostream>
 using namespace Dijkstra;
 
@@ -177,13 +176,18 @@ Status Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
 // return: std::vector<int> sequence of [route_id] in the path
 std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE routeType, POLICY_TYPE decisionKind)
 { //采用堆优化的Dijkstra算法，计算三种情况下的值
-    std::cout << "search() called: " << startCityID << " " << endCityID << " " << routeType << " " << decisionKind << std::endl;
+    std::cout << "DijkstraSearch() called: "
+              << "startCityID:" << startCityID << ", endCityID: " << endCityID << ", routeType: " << (routeType == PLANE ? "PLANE" : "TRAIN")
+              << ", decisionKind: " << ((decisionKind == COST) ? "COST" 
+              : (decisionKind == TIME) ? "TIME" : "INTERCHANGE")
+              << std::endl; // Debug
+
     if (startCityID < 0 || startCityID >= Map.city.size() || endCityID < 0 || endCityID >= Map.city.size()) {
-        std::cout << "err1" << std::endl;
+        std::cout << "err: Overflow" << std::endl; // Debug
         return std::vector<int>(0); //合法性检查
     }
     if (!Map.city[startCityID].existence || !Map.city[endCityID].existence || !Map.city[startCityID].first) {
-        std::cout << "err2" << std::endl;
+        std::cout << "err: not existent" << std::endl; // Debug
         return std::vector<int>(0); //不存在城市或起点城市不存在任何线路
     }
 
@@ -221,9 +225,10 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
         q.pop();
         int lCity = comeRoute.endCityIndex;
         if (visited[lCity])
-            continue;                          //重复到达该点，跳过
-        routeRecord.push_back(comeRoute);      //第一次到达该城市，说明相应边开销最小
-        visited[lCity] = true;                 //更新：到达过该城市
+            continue;                                                  //重复到达该点，跳过
+        routeRecord.push_back(comeRoute);                              //第一次到达该城市，说明相应边开销最小
+        std::cout << "\tadd City " << lCity << " into Set" << std::endl; // Debug
+        visited[lCity] = true;                                         //更新：到达过该城市
 
         //更新以该城市为出发点的其他城市的花费
         for (NodeLink *p = Map.city[lCity].first; p; p = p->next)
@@ -236,29 +241,27 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                     if (searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
                         minCost[i] = searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
-                        std::cout << "updata minCost[i] = " << minCost[i] << std::endl;
+                        std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl; // Debug
                         q.push(std::make_pair(minCost[i], p->routeInfo));
                     }
                 }
-                else {//在花费和换乘计算中，返回值是增量，所以需要累加
-                    if (lCity == startCityID && decisionKind == INTERCHANGE)
-                    {//特殊处理：在始发站的直达站，换乘均为0
-                        for (int i = 0; i < Map.city.size(); i++)
-                        {
-                            minCost[i] = (searchDirectRoute(startCityID, i, routeType, COST, 0) < MAXWEIGHT) ? 0 : MAXWEIGHT;
-                            if (minCost[i] < MAXWEIGHT)
-                                q.push(std::make_pair(minCost[i], p->routeInfo));
-                        }
-                    }
-                    else if (minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
-                    {
-                        minCost[i] = minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
+                else if(lCity == startCityID && decisionKind == INTERCHANGE)
+                {//特殊处理：在始发站的直达站，换乘均为0
+                        int i = p->routeInfo.endCityIndex;
+                        minCost[i] = 0;
+                        std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl; // Debug
                         q.push(std::make_pair(minCost[i], p->routeInfo));
-                    }
+                }
+                else if (minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
+                { //在花费和换乘计算中，返回值是增量，所以需要累加
+                    minCost[i] = minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
+                    std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl; // Debug
+                    q.push(std::make_pair(minCost[i], p->routeInfo));
                 }
             }
-        } //更新其他城市的花费
-    }
+        }
+    } //更新其他城市的花费
+
 
     //如果目标城市还没有被访问过，说明没有路径
     if (!visited[endCityID])
@@ -275,7 +278,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
             tmpRecord.push_back(routeRecord[i].routeID);
         }
     }
-    for (int i = 0; i < tmpRecord.size(); i++)
+    for (int i = tmpRecord.size() - 1; i >= 0; i--)
         pathRecord.push_back(tmpRecord[i]);
     return pathRecord;
 }
@@ -311,18 +314,17 @@ int searchDirectRoute(int startCity, int endCity, ROUTE_TYPE routeType, POLICY_T
                     if (p->routeInfo.startTime >= startTime)
                     { //找到了startCity到endCity的符合要求的路径
                         res = 1; //默认新路径需要一次额外中转
-                        for(auto city:Map.city)
+                        for(auto city: Map.city)
                         {
                             if(city.existence)
                             {
-                                NodeLink *mp = city.first;//遍历所有的边
-                                while (mp)
+                                //遍历所有的边
+                                for (NodeLink *bp = city.first; bp; bp = bp->next)
                                 {
-                                    if (p->routeInfo.endCityIndex == startCity)
-                                        if (API::isSameTrain(p->routeInfo.routeID, mp->routeInfo.routeID))
+                                    if (bp->routeInfo.endCityIndex == startCity)
+                                        if (API::isSameTrain(p->routeInfo.routeID, bp->routeInfo.routeID))
                                             return 0; 
                                             //如果在到达startCity的路径中存在同一列火车，说明从startCity到达endCity不需要换乘，返回0
-                                    mp = mp->next;
                                 }
                             }
                         }
