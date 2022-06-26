@@ -223,7 +223,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
         if (visited[lCity])
             continue;                          //重复到达该点，跳过
         routeRecord.push_back(comeRoute);      //第一次到达该城市，说明相应边开销最小
-        visited[lCity] = true; //更新：到达过该城市
+        visited[lCity] = true;                 //更新：到达过该城市
 
         //更新以该城市为出发点的其他城市的花费
         for (NodeLink *p = Map.city[lCity].first; p; p = p->next)
@@ -235,7 +235,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                 { //在时间函数中，返回值是线路的到达时间，所以不需要累加
                     if (searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
-                        minCost[i] = searchDirectRoute(lCity, i, routeType, decisionKind, p->routeInfo.endTime);
+                        minCost[i] = searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
                         q.push(std::make_pair(minCost[i], p->routeInfo));
                     }
                 }
@@ -251,7 +251,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                     }
                     else if (minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
-                        minCost[i] = minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, p->routeInfo.endTime);
+                        minCost[i] = minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
                         q.push(std::make_pair(minCost[i], p->routeInfo));
                     }
                 }
@@ -262,10 +262,11 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
     //如果目标城市还没有被访问过，说明没有路径
     if (!visited[endCityID])
         return std::vector<int>(0);
-    
+
     //从routeRecord中读取合适的pathRecord
     //利用tmpRecord模拟栈进行中转
-    for (int i = routeRecord.size() - 1; i >= 0; i--)
+    // routeRecord的0号位置永远是无意义路径null，所以用i>0规避
+    for (int i = routeRecord.size() - 1; i > 0; i--)
     {
         if (routeRecord[i].endCityIndex == beforeCityID)
         {
@@ -287,8 +288,7 @@ int searchDirectRoute(int startCity, int endCity, ROUTE_TYPE routeType, POLICY_T
     if (startCity == endCity)
         return 0;
 
-    NodeLink *p = Map.city[startCity].first;
-    while (p)
+    for (NodeLink *p = Map.city[startCity].first; p; p = p->next)
     {
         if (p->routeInfo.endCityIndex == endCity && p->routeInfo.routeType == routeType)
         {
