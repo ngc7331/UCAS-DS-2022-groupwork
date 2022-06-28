@@ -12,29 +12,32 @@ else \
 #define getParamString(key) assertParam(key) key = req.url_params.get(#key)
 #define getParamInt(key) assertParam(key) key = atoi(req.url_params.get(#key))
 
+extern std::map<int, std::string> city_list;
+extern std::map<int, std::string> train_list;
+extern std::map<int, std::string> plane_list;
+
 Server::Server() {
-    /* --- root --- */
+    /* --- static file --- */
     CROW_ROUTE(app, "/")([]() {
         crow::response resp;
-        resp.redirect("/user");
+        resp.set_static_file_info(STATIC_FILE_PATH "index.html");
         return resp;
     });
 
-    /* --- static page --- */
-    CROW_ROUTE(app, "/user")([]() {
+    CROW_ROUTE(app, "/css/<path>")([](std::string f) {
         crow::response resp;
-        resp.set_static_file_info(STATIC_FILE_PATH "user.html");
+        resp.set_static_file_info(STATIC_FILE_PATH "css/" + f);
         return resp;
     });
 
-    CROW_ROUTE(app, "/admin")([]() {
+    CROW_ROUTE(app, "/js/<path>")([](std::string f) {
         crow::response resp;
-        resp.set_static_file_info(STATIC_FILE_PATH "admin.html");
+        resp.set_static_file_info(STATIC_FILE_PATH "js/" + f);
         return resp;
     });
 
     /* --- data --- */
-    CROW_ROUTE(app, "/" DATA_PATH "<string>")([](std::string f) {
+    CROW_ROUTE(app, "/data/<string>")([](std::string f) {
         crow::response resp;
         resp.set_static_file_info(DATA_PATH + f);
         return resp;
@@ -49,7 +52,7 @@ Server::Server() {
             code,
             "",
             "City Created",
-            code==ERR_VALUE ? "City" + name + "already existed" : "Internal Server Error, see log"
+            code==ERR_VALUE ? "City " + name + " already existed" : "Internal Server Error, see log"
         );
     });
 
@@ -96,7 +99,40 @@ Server::Server() {
         getParamInt(tp);
         getParamInt(policy);
         std::vector<int> res = API::search(a, b, tp, policy);
-        return Server::respond(OK, "", "", "");
+        std::string msg, err;
+        crow::json::wvalue data;
+        Status code = OK;
+        if (res.size() == 0) {
+            err = "没有找到符合要求的路径";
+            code = ERR_VALUE;
+        }
+        else if (res[0] == -1) {
+            err = "输入无效或内部错误";
+            code = ERR;
+        }
+        else {
+            int cost = 0, trip_duration = 0, interchange = 0;
+            std::map<int, std::string> *list = tp==TRAIN ? &train_list : &plane_list;
+            crow::json::rvalue from = crow::json::load((*list)[res[0]]);
+            crow::json::rvalue to = crow::json::load((*list)[res[res.size()-1]]);
+            int duration = to[3].i() + to[4].i() - from[3].i();
+            std::string lastname;
+            for (int i=0; i<res.size(); i++) {
+                crow::json::rvalue r = crow::json::load((*list)[res[i]]);
+                cost += r[5].i();
+                trip_duration += r[4].i();
+                if (i != 0 && r[0].s() != lastname)
+                    interchange ++;
+                lastname = r[0].s();
+            }
+            data["path"] = res;
+            data["cost"] = cost;
+            data["duration"] = duration;
+            data["trip_duration"] = trip_duration;
+            data["interchange"] = interchange;
+            data["tp"] = tp;
+        }
+        return Server::respond(code, data.dump(), msg, err);
     });
 }
 

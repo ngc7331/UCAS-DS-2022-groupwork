@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>全国交通咨询模拟系统-管理模式</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.min.js"></script>
+        <link href="css/public.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="body" id="app">
+            <h1 class="title">全国交通咨询模拟系统-{{ admin ? "管理" : "用户" }}模式</h1>
+            <div class="block" v-if="!admin">
+                <h3 class="title">搜索</h3>
+                <div class="center">
+                    <select style="width:16%" @change="setAlgo()" v-model="algo">
+                        <option value="0">动态规划</option>
+                        <option value="1">Dijkstra</option>
+                    </select>
+                    <select style="width:16%" v-model="search_arg[0]">
+                        <option disabled value="">请选择出发城市</option>
+                        <option v-for="(c, i) in city" :value="i">
+                            {{ c }}
+                        </option>
+                    </select>
+                    <select style="width:16%" v-model="search_arg[1]">
+                        <option disabled value="">请选择到达城市</option>
+                        <option v-for="(c, i) in city" :value="i">
+                            {{ c }}
+                        </option>
+                    </select>
+                    <select style="width:16%" v-model="search_arg[2]">
+                        <option disabled value="">请选择出行方式</option>
+                        <option value="0">火车</option>
+                        <option value="1">飞机</option>
+                    </select>
+                    <select style="width:16%" v-model="search_arg[3]">
+                        <option disabled value="">请选择策略</option>
+                        <option value="0">最少花费</option>
+                        <option value="1">最短时间</option>
+                        <option value="2">最少中转</option>
+                    </select>
+                    <button @click="search()">搜索！</button>
+                </div>
+                <div>
+                    <h4 class="title" style="margin-top: 3vh; margin-bottom: 1vh;">搜索结果</h4>
+                    <div class="center">
+                        <span>共计花费: {{ result.cost }}元</span>
+                        <span>总时长: {{ result.duration }}分钟</span>
+                        <span>总行程时长 {{ result.trip_duration }}分钟</span>
+                        <span>总中转: {{ result.interchange }}次</span>
+                    </div>
+                    <table>
+                        <tr>
+                            <th style="width:5%" class="right">序号</th>
+                            <th style="width:15%">车次</th>
+                            <th style="width:10%">起点</th>
+                            <th style="width:10%">终点</th>
+                            <th style="width:20%">出发</th>
+                            <th style="width:20%">到达</th>
+                            <th style="width:10%">票价</th>
+                        </tr>
+                        <tr v-for="c in result.path">
+                            <td class="right">{{ c }}</td>
+                            <td>{{ pathinfo[c][0] }}</td>
+                            <td>{{ city[pathinfo[c][1]] }}</td>
+                            <td>{{ city[pathinfo[c][2]] }}</td>
+                            <td>{{ strfTime(pathinfo[c][3]) }}</td>
+                            <td>{{ strfTime(pathinfo[c][3] + pathinfo[c][4]) }}</td>
+                            <td>{{ pathinfo[c][5] }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <hr/>
+            <div class="block">
+                <h3 class="title">城市列表</h3>
+                <table style="width:40vw">
+                    <tr>
+                        <th style="width:5%" class="right">序号</th>
+                        <th style="width:15%">城市名</th>
+                        <th style="width:10%" v-if="admin">操作</th>
+                    </tr>
+                    <tr v-for="(c, i) in city">
+                        <td class="right">{{ i }}</td>
+                        <td>{{ c }}</td>
+                        <td v-if="admin"><button @click="delCity(i)">删除</button></td>
+                    </tr>
+                    <tr v-if="admin">
+                        <td class="right"> {{ new_city_id }} </td>
+                        <td><input v-model="new_city" type="text" placeholder="请输入城市名"></td>
+                        <td v-if="admin"><button @click="newCity()">创建</button></td>
+                    </tr>
+                </table>
+            </div>
+            <hr/>
+            <div class="block">
+                <h3 class="title">火车车次列表</h3>
+                <table>
+                    <tr>
+                        <th style="width:5%" class="right">序号</th>
+                        <th style="width:15%">车次</th>
+                        <th style="width:10%">起点</th>
+                        <th style="width:10%">终点</th>
+                        <th style="width:20%">出发</th>
+                        <th style="width:20%">到达</th>
+                        <th style="width:10%">票价</th>
+                        <th style="width:10%" v-if="admin">操作</th>
+                    </tr>
+                    <tr v-for="(c, i) in train">
+                        <td class="right">{{ i }}</td>
+                        <td>{{ c[0] }}</td>
+                        <td>{{ city[c[1]] }}</td>
+                        <td>{{ city[c[2]] }}</td>
+                        <td>{{ strfTime(c[3]) }}</td>
+                        <td>{{ strfTime(c[3] + c[4]) }}</td>
+                        <td>{{ c[5] }}</td>
+                        <td v-if="admin"><button @click="delRoute(i, 0)">删除</button></td>
+                    </tr>
+                    <tr v-if="admin">
+                        <td class="right"> {{ new_train_id }} </td>
+                        <td><input v-model="new_train[0]" type="text" placeholder="请输入车次"></td>
+                        <td>
+                            <select v-model="new_train[1]">
+                                <option disabled value="">请选择出发城市</option>
+                                <option v-for="(c, i) in city" :value="i">
+                                    {{ c }}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <select v-model="new_train[2]">
+                                <option disabled value="">请选择到达城市</option>
+                                <option v-for="(c, i) in city" :value="i">
+                                    {{ c }}
+                                </option>
+                            </select>
+                        </td>
+                        <td><input v-model="new_train[3]" type="number" min="0" placeholder="请输入出发时间(min)"></td>
+                        <td><input v-model="new_train[4]" type="number" min="0" placeholder="请输入到达时间(min)"></td>
+                        <td><input v-model="new_train[5]" type="number" min="0" placeholder="请输入票价(元)"></td>
+                        <td v-if="admin"><button @click="newRoute(0)">创建</button></td>
+                    </tr>
+                </table>
+            </div>
+            <hr/>
+            <div class="block">
+                <h3 class="title">飞机航班列表</h3>
+                <table>
+                    <tr>
+                        <th style="width:5%" class="right">序号</th>
+                        <th style="width:15%">航班号</th>
+                        <th style="width:10%">起点</th>
+                        <th style="width:10%">终点</th>
+                        <th style="width:20%">出发</th>
+                        <th style="width:20%">到达</th>
+                        <th style="width:10%">票价</th>
+                        <th style="width:10%" v-if="admin">操作</th>
+                    </tr>
+                    <tr v-for="(c, i) in plane">
+                        <td class="right">{{ i }}</td>
+                        <td>{{ c[0] }}</td>
+                        <td>{{ city[c[1]] }}</td>
+                        <td>{{ city[c[2]] }}</td>
+                        <td>{{ strfTime(c[3]) }}</td>
+                        <td>{{ strfTime(c[3] + c[4]) }}</td>
+                        <td>{{ c[5] }}</td>
+                        <td v-if="admin"><button @click="delRoute(i, 1)">删除</button></td>
+                    </tr>
+                    <tr v-if="admin">
+                        <td class="right"> {{ new_plane_id }} </td>
+                        <td><input v-model="new_plane[0]" type="text" placeholder="请输入航班号"></td>
+                        <td>
+                            <select v-model="new_plane[1]">
+                                <option disabled value="">请选择出发城市</option>
+                                <option v-for="(c, i) in city" :value="i">
+                                    {{ c }}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <select v-model="new_plane[2]">
+                                <option disabled value="">请选择到达城市</option>
+                                <option v-for="(c, i) in city" :value="i">
+                                    {{ c }}
+                                </option>
+                            </select>
+                        </td>
+                        <td><input v-model="new_plane[3]" type="number" min="0" placeholder="请输入出发时间(min)"></td>
+                        <td><input v-model="new_plane[4]" type="number" min="0" placeholder="请输入到达时间(min)"></td>
+                        <td><input v-model="new_plane[5]" type="number" min="0" placeholder="请输入票价(元)"></td>
+                        <td v-if="admin"><button @click="newRoute(1)">创建</button></td>
+                    </tr>
+                </table>
+            </div>
+            <footer class="footer">
+                <a href="#" @click="switchMode()">切换{{ admin ? "用户" : "管理" }}模式</a>
+            </footer>
+        </div>
+    </body>
+    <script src="js/app.js"></script>
+</html>

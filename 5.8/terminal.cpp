@@ -112,7 +112,7 @@ void Terminal::run() {
             cout << "请输入出发时间(min): "; cin >> t; getchar();
             cout << "请输入到达时间(min): "; cin >> d; getchar();
             cout << "请输入票价: "; cin >> c; getchar();
-            switch (API::newRoute(buffer, -op-2, a, b, t, d-t, c)) {
+            switch (API::newRoute(buffer, -op-2, a, b, t, d, c)) {
             case OK: CLS; Terminal::printRoute(-op-2); break;
             case ERR_ASSERTION: cout << "起点或终点城市不存在！" << endl; break;
             default: cout << "程序错误" << endl; break;
@@ -180,7 +180,7 @@ void Terminal::printRoute(int tp) {
 
     cout << "=== " << (tp==TRAIN?"车次":"航班") << "列表 ===" << endl;
     cout << std::right;
-    cout << " id |   编号   |  起点  |  终点  |    出发    |    到达    |  票价" << endl;
+    cout << " id |  " << (tp==TRAIN?" 车次 ":"航班号") << "  |  起点  |  终点  |    出发    |    到达    |  票价" << endl;
     for (auto &iter : *list) {
         crow::json::rvalue r = crow::json::load(iter.second);
         cout << std::setw(3) << iter.first << " | ";

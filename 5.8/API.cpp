@@ -129,6 +129,7 @@ Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c
             return ERR_ASSERTION;
     ROUTE_TYPE route_type;
     std::stringstream buffer;
+    d -= t;  // caculate duration
     buffer << "[\"" << name << "\"," << a << "," << b << "," << t << "," << d << "," << c << "]";
     int id;
     switch(tp) {

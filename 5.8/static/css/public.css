@@ -1,0 +1,44 @@
+.title {
+    margin: 7vh 0 3vh 0;
+    text-align: center;
+}
+
+.body {
+    margin: 5vmin 15vmin;
+}
+
+table {
+    text-align: center;
+    width: 80vw;
+}
+
+span {
+    margin: 0 2vw;
+}
+
+input, select {
+    margin: 1vmin;
+    width: 90%;
+}
+
+hr {
+    margin: 10vh 0 5vh 0;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer {
+    margin-top: 3vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: gray;
+}
