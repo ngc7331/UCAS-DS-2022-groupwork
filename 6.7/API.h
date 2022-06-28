@@ -4,7 +4,6 @@ using namespace std;
 const int SIZE = 1100, VAL_RANGE = 100;
 
 int valNumber; //number of values in a record
-int priority[5]; //priority of values, start from index 0
 
 struct Record
 {
