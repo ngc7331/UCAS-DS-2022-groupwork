@@ -77,6 +77,11 @@ Status API::setAlgo(int tp) {
 }
 
 bool API::isSameTrain(int a, int b) {
+    if (!train_list.size() || a > train_list.rbegin()->first || b > train_list.rbegin()->first) {
+        std::cout << "API::isSameTrain() Warning: out of range(a=" << a << ", b=" << b << ", last=" << (train_list.size() ? train_list.rbegin()->first : 0) << ")";
+        std::cout << "this may be caused by a program error or invalid data" << std::endl;
+        return false;
+    }
     crow::json::rvalue ra = crow::json::load(train_list[a]);
     crow::json::rvalue rb = crow::json::load(train_list[b]);
     return ra[0].s() == rb[0].s();
