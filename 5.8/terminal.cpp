@@ -44,18 +44,19 @@ void Terminal::help() {
 }
 
 void Terminal::run() {
-    int op, a, b, route_type, policy;
+    int op, a, b, route_type, policy, t, d, c;
     std::vector<int> res;
+    string buffer;
     CLS;
     cout << "=== 终端模式启动 ===" << endl;
     while (true) {
         Terminal::printMenu();
         cout << "请输入操作序号: "; cin >> op; getchar();
-        if (admin) op += 10;
+        if (admin) op = -op;
         switch (op) {
-        case 0:
+        case 0:            // exit
             CLS; return ;
-        case 1:
+        case 1:            // search
             CLS;
             Terminal::printCity();
             cout << "请输入起点id: "; cin >> a; getchar();
@@ -65,26 +66,72 @@ void Terminal::run() {
             CLS;
             Terminal::printResult(API::search(a, b, route_type, policy), route_type);
             PAUSE; CLS; break ;
-        case 2:
+        case 2:            // print city
             CLS;
             Terminal::printCity();
             PAUSE; CLS; break ;
-        case 3: case 4:
+        case 3: case 4:    // print train/plane
             CLS;
             Terminal::printRoute(op-3);
             PAUSE; CLS; break ;
-        case 18:
-            DEBUGMODE = !DEBUGMODE;
-            CLS;
-            cout << "调试信息已" << (DEBUGMODE?"开启":"关闭") << endl;
-            break;
-        case 9: case 19:
-            admin = !admin;
-            CLS; break;
-        case 8:
+        case 8:            // switch algorithm
             algorithm = algorithm == ALGO_DP ? ALGO_DIJK : ALGO_DP;
             CLS;
             cout << "算法切换至" << (algorithm==ALGO_DP?"动态规划":"Dijkstra") << endl;
+            break;
+        case 9: case -9:   // switch admin
+            admin = !admin;
+            CLS; break;
+        case -1:           // newCity
+            CLS;
+            Terminal::printCity();
+            cout << "请输入新城市名: "; cin >> buffer; getchar();
+            switch (API::newCity(buffer)) {
+            case OK: CLS; Terminal::printCity(); break;
+            case ERR_VALUE: cout << "城市已存在！" << endl; break;
+            default: cout << "程序错误" << endl; break;
+            }
+            PAUSE; CLS; break;
+        case -4:           // delCity
+            CLS;
+            Terminal::printCity();
+            cout << "请输入要删除的城市id: "; cin >> a; getchar();
+            switch (API::delCity(a)) {
+            case OK: CLS; Terminal::printCity(); break;
+            case ERR_VALUE: cout << "城市不存在！" << endl; break;
+            default: cout << "程序错误" << endl; break;
+            }
+            PAUSE; CLS; break;
+        case -2: case -3:  // newRoute
+            CLS;
+            Terminal::printCity();
+            Terminal::printRoute(-op-2);
+            cout << "请输入新" << (op==-2?"车次":"航班") << "编号: "; cin >> buffer; getchar();
+            cout << "请输入起点城市id: "; cin >> a; getchar();
+            cout << "请输入终点城市id: "; cin >> b; getchar();
+            cout << "请输入出发时间(min): "; cin >> t; getchar();
+            cout << "请输入到达时间(min): "; cin >> d; getchar();
+            cout << "请输入票价: "; cin >> c; getchar();
+            switch (API::newRoute(buffer, -op-2, a, b, t, d-t, c)) {
+            case OK: CLS; Terminal::printRoute(-op-2); break;
+            case ERR_ASSERTION: cout << "起点或终点城市不存在！" << endl; break;
+            default: cout << "程序错误" << endl; break;
+            }
+            PAUSE; CLS; break;
+        case -5: case -6:  // delRoute
+            CLS;
+            Terminal::printRoute(-op-5);
+            cout << "请输入要删除的路线id: "; cin >> a; getchar();
+            switch (API::delRoute(a, -op-5)) {
+            case OK: CLS; Terminal::printRoute(-op-5); break;
+            case ERR_VALUE: cout << "路线不存在！" << endl; break;
+            default: cout << "程序错误" << endl; break;
+            }
+            PAUSE; CLS; break;
+        case -8:           // switch debug
+            DEBUGMODE = !DEBUGMODE;
+            CLS;
+            cout << "调试信息已" << (DEBUGMODE?"开启":"关闭") << endl;
             break;
         default:
             CLS; cout << "输入无效！" << endl; break;
