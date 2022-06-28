@@ -36,12 +36,12 @@ namespace LSD
     //desp: internal sort
     //args: Recoord record array
     //args: int length of record array
-    void internalSort(Record, int);
+    void internalSort(Record*, int);
 
     //desp: radix sort
     //args: Record record array
     //args: int len
-    void radixSort(Record, int);
+    void radixSort(Record*, int);
 }
 
 namespace MSD
@@ -49,10 +49,10 @@ namespace MSD
     //desp: internal sort
     //args: Recoord record array
     //args: int length of record array
-    void internalSort(Record, int);
+    void internalSort(Record*, int);
 
     //desp: radix sort
     //args: Record record array
     //args: int len
-    void radixSort(Record, int);
+    void radixSort(Record*, int);
 }
