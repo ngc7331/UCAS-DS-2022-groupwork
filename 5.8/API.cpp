@@ -124,6 +124,9 @@ Status API::delCity(int id) {
 }
 
 Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c) {
+    // assert a & b are existing city id
+    if (city_list.find(a) == city_list.end() || city_list.find(b) == city_list.end())
+            return ERR_ASSERTION;
     ROUTE_TYPE route_type;
     std::stringstream buffer;
     buffer << "[\"" << name << "\"," << a << "," << b << "," << t << "," << d << "," << c << "]";
