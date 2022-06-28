@@ -129,13 +129,13 @@ Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c
     buffer << "[\"" << name << "\"," << a << "," << b << "," << t << "," << d << "," << c << "]";
     int id;
     switch(tp) {
-    case 0:
+    case TRAIN:
         route_type = TRAIN;
         id = newId(1);
         train_list[id] = buffer.str();
         API::saveFile(DATA_PATH "train.json", train_list);
         break;
-    case 1:
+    case PLANE:
         route_type = PLANE;
         id = newId(2);
         plane_list[id] = buffer.str();
@@ -150,13 +150,13 @@ Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c
 Status API::delRoute(int id, int tp) {
     ROUTE_TYPE route_type;
     switch(tp) {
-    case 0:
+    case TRAIN:
         route_type = TRAIN;
         if (!train_list.count(id)) return ERR_VALUE;
         train_list.erase(id);
         API::saveFile(DATA_PATH "train.json", train_list);
         break;
-    case 1:
+    case PLANE:
         route_type = PLANE;
         if (!plane_list.count(id)) return ERR_VALUE;
         plane_list.erase(id);
@@ -172,15 +172,15 @@ std::vector<int> API::search(int a, int b, int r, int p) {
     // call
     ROUTE_TYPE route_type;
     switch (r) {
-    case 0: route_type = TRAIN; break;
-    case 1: route_type = PLANE; break;
+    case TRAIN: route_type = TRAIN; break;
+    case PLANE: route_type = PLANE; break;
     default: return {-1};
     }
     POLICY_TYPE policy;
     switch (p) {
-    case 0: policy = COST; break;
-    case 1: policy = TIME; break;
-    case 2: policy = INTERCHANGE; break;
+    case COST: policy = COST; break;
+    case TIME: policy = TIME; break;
+    case INTERCHANGE: policy = INTERCHANGE; break;
     default: return {-1};
     }
     switch (algorithm) {

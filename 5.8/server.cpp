@@ -98,26 +98,13 @@ Server::Server() {
         std::vector<int> res = API::search(a, b, tp, policy);
         return Server::respond(OK, "", "", "");
     });
-
-    /* --- DEMO --- */
-    // DEMO: string arg
-    CROW_ROUTE(app, "/hello")([](const crow::request& req) {
-        std::string name;
-        getParamString(name);
-        return crow::response(200, "Hello " + name + "! ");
-    });
-
-    // DEMO: int arg
-    CROW_ROUTE(app, "/add")([](const crow::request& req) {
-        int a, b;
-        getParamInt(a);
-        getParamInt(b);
-        return crow::response(200, std::to_string(a + b));
-    });
 }
 
 void Server::run() {
-    std::cout << "Running at server mode, press Ctrl+C to exit" << std::endl;
+    std::cout << "=== WebUI 模式启动 ===" << std::endl;
+    std::cout << "请用浏览器访问 http://127.0.0.1:" << Server::PORT << std::endl;
+    std::cout << "请按 Ctrl + C 退出程序" << std::endl;
+    std::cout << "=== 服务器日志 ===" << std::endl;
     Server::app.port(Server::PORT).multithreaded().run();
 }
 

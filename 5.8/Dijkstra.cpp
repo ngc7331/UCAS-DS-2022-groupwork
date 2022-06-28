@@ -5,6 +5,9 @@ using namespace Dijkstra;
 
 #define MAXWEIGHT 0XFFFF
 
+extern bool DEBUGMODE;
+#define DEBUG(expr) if(DEBUGMODE) {expr}
+
 //说明：
 //删除完城市与路径时，整个体系的合法性需要由前端保证
 
@@ -56,7 +59,7 @@ int searchDirectRoute(int startCity, int endCity, ROUTE_TYPE routeType, POLICY_T
 // return: Status code
 Status Dijkstra::newCity(int cityID)
 {
-    std::cout << "newCity() called: " << cityID << std::endl;
+    DEBUG(std::cout << "newCity() called: " << cityID << std::endl;)
     if (cityID >= 0)
     {
         if (cityID >= Map.city.size())
@@ -99,7 +102,7 @@ Status Dijkstra::delCity(int cityID)
 // return: Status code
 Status Dijkstra::newRoute(int routeID, ROUTE_TYPE routeType, int startCityID, int endCityID, int startTime, int duration, int cost)
 {
-    std::cout << "newRoute() called: " << routeID << " " << routeType << " " << startCityID << " " << endCityID << " " << startTime << " " << duration << " " << cost << std::endl;
+    DEBUG(std::cout << "newRoute() called: " << routeID << " " << routeType << " " << startCityID << " " << endCityID << " " << startTime << " " << duration << " " << cost << std::endl;)
     if (startCityID < 0 || endCityID < 0)
         return ERR_VALUE; //输入边不合法
 
@@ -176,11 +179,13 @@ Status Dijkstra::delRoute(int routeID, ROUTE_TYPE routeType)
 // return: std::vector<int> sequence of [route_id] in the path
 std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE routeType, POLICY_TYPE decisionKind)
 { //采用堆优化的Dijkstra算法，计算三种情况下的值
-    std::cout << "DijkstraSearch() called: "
-              << "startCityID:" << startCityID << ", endCityID: " << endCityID << ", routeType: " << (routeType == PLANE ? "PLANE" : "TRAIN")
-              << ", decisionKind: " << ((decisionKind == COST) ? "COST" 
-              : (decisionKind == TIME) ? "TIME" : "INTERCHANGE")
-              << std::endl; // Debug
+    DEBUG(
+        std::cout << "DijkstraSearch() called: "
+                  << "startCityID:" << startCityID << ", endCityID: " << endCityID << ", routeType: " << (routeType == PLANE ? "PLANE" : "TRAIN")
+                  << ", decisionKind: " << ((decisionKind == COST) ? "COST"
+                  : (decisionKind == TIME) ? "TIME" : "INTERCHANGE")
+                  << std::endl; // Debug
+    )
 
     if (startCityID < 0 || startCityID >= Map.city.size() || endCityID < 0 || endCityID >= Map.city.size()) {
         std::cout << "err: Overflow" << std::endl; // Debug
@@ -227,7 +232,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
         if (visited[lCity])
             continue;                                                  //重复到达该点，跳过
         routeRecord.push_back(comeRoute);                              //第一次到达该城市，说明相应边开销最小
-        std::cout << "\tadd City " << lCity << " into Set" << std::endl; // Debug
+        DEBUG(std::cout << "\tadd City " << lCity << " into Set" << std::endl;) // Debug
         visited[lCity] = true;                                         //更新：到达过该城市
 
         //更新以该城市为出发点的其他城市的花费
@@ -241,7 +246,7 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                     if (searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                     {
                         minCost[i] = searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
-                        std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl; // Debug
+                        DEBUG(std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl;) // Debug
                         q.push(std::make_pair(minCost[i], p->routeInfo));
                     }
                 }
@@ -249,13 +254,13 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
                 {//特殊处理：在始发站的直达站，换乘均为0
                         int i = p->routeInfo.endCityIndex;
                         minCost[i] = 0;
-                        std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl; // Debug
+                        DEBUG(std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl;) // Debug
                         q.push(std::make_pair(minCost[i], p->routeInfo));
                 }
                 else if (minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime) < minCost[i])
                 { //在花费和换乘计算中，返回值是增量，所以需要累加
                     minCost[i] = minCost[lCity] + searchDirectRoute(lCity, i, routeType, decisionKind, comeRoute.endTime);
-                    std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl; // Debug
+                    DEBUG(std::cout << "\t\tupdata minCost[" << i << "] = " << minCost[i] << std::endl;) // Debug
                     q.push(std::make_pair(minCost[i], p->routeInfo));
                 }
             }
