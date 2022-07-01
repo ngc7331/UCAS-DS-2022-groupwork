@@ -6,6 +6,8 @@
 #include <vector>
 #include "type.h"
 
+const int MAX_CITY = 1e5;
+
 namespace API {
     // desp:   get city id by its name
     // args:   std::string name
