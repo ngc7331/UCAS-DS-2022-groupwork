@@ -30,8 +30,5 @@ namespace MSD
     //args: int length of record array
     void internalSort(Record*, int);
 
-    //desp: radix sort
-    //args: Record record array
-    //args: int len
-    void radixSort(Record*, int);
+    // MSD并不能使用分配和收集的算法，所以只使用内部排序
 }
