@@ -30,21 +30,21 @@ vector <pair <PreEdge, int>> f[MAX_CITY];
 vector <int> suffixMin[MAX_CITY];
 bool exis[MAX_CITY];
 
-Status newCity(int x)
+Status DP::newCity(int x)
 {
     if (exis[x]) return ERR_VALUE;
     exis[x] = 1;
     return OK;
 }
 
-Status delCity(int x)
+Status DP::delCity(int x)
 {
     if (!exis[x]) return ERR_VALUE;
     exis[x] = 0;
     return OK;
 }
 
-Status newRoute(int id, ROUTE_TYPE type, int s, int t, int sTime, int duration, int cost)
+Status DP::newRoute(int id, ROUTE_TYPE type, int s, int t, int sTime, int duration, int cost)
 {
     Edge tmp = Edge(id, s, t, sTime, sTime + duration, cost);
     if (edge[type].find(tmp) != edge[type].end()) return ERR_VALUE;
@@ -56,7 +56,7 @@ Status newRoute(int id, ROUTE_TYPE type, int s, int t, int sTime, int duration, 
 // args:   int route_id
 // args:   ROUTE_TYPE route_type
 // return: Status code
-Status delRoute(int id, ROUTE_TYPE type) //maybe need some more information
+Status DP::delRoute(int id, ROUTE_TYPE type) //maybe need some more information
 {
 
 }
@@ -66,7 +66,7 @@ void init()
 
 }
 
-vector <int> search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
+vector <int> DP::search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
 {
     init();
     for (auto i : edge[routeType])
