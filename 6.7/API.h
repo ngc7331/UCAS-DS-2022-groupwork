@@ -1,7 +1,9 @@
 #include <algorithm>
 using namespace std;
 
-const int SIZE = 1100, VAL_RANGE = 100;
+#define SIZE 1100
+#define VAL_RANGE 100
+#define PRIORITY_NUM 5
 
 int valNumber; //number of values in a record
 

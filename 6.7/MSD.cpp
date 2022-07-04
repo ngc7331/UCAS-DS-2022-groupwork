@@ -1,8 +1,7 @@
 #include "API.h"
 #include<iostream>
 
-#define PRIORITY_NUM 5
-bool DEBUGMODE;
+extern bool DEBUGMODE;
 #define DEBUG(expr) \
     if (DEBUGMODE)  \
     {               \

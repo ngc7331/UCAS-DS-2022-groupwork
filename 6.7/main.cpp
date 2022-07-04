@@ -5,6 +5,8 @@ using namespace std;
 int len;
 Record record[SIZE];
 
+bool DEBUGMODE;
+
 int priority[5];
 
 int main()
