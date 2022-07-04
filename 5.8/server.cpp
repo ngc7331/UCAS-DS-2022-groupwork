@@ -159,13 +159,15 @@ crow::response Server::respond(Status code, std::string data, std::string msg, s
         resp.code = 400; break;
     default:
         resp.code = 500;
+        err += "\n===\n程序内部错误，可能出现数据不一致的问题，请重启服务端\n";
+        break;
     }
 
     crow::json::wvalue body;
     body["code"] = code;
     body["data"] = data;
-    body["msg"] = code == OK ? msg : "";
-    body["err"] = code == OK ? "" : err;
+    body["msg"] = msg;
+    body["err"] = err;
     resp.body = body.dump();
 
     resp.set_header("content-type", "application/json");

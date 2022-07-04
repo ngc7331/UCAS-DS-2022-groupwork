@@ -52,19 +52,19 @@ int main(int argc, char **argv) {
     train_list = API::loadFile(DATA_PATH "train.json");
     plane_list = API::loadFile(DATA_PATH "plane.json");
     for (auto &iter : city_list) {
-        // DP::newCity(iter.first);
+        DP::newCity(iter.first);
         Dijkstra::newCity(iter.first);
     }
     for (auto &iter : train_list) {
         crow::json::rvalue r = crow::json::load(iter.second);
         int a = r[1].i(), b = r[2].i(), t = r[3].i(), d = r[4].i(), c = r[5].i();
-        // DP::newRoute(iter.first, TRAIN, a, b, t, d, c);
+        DP::newRoute(iter.first, TRAIN, a, b, t, d, c);
         Dijkstra::newRoute(iter.first, TRAIN, a, b, t, d, c);
     }
     for (auto &iter : plane_list) {
         crow::json::rvalue r = crow::json::load(iter.second);
         int a = r[1].i(), b = r[2].i(), t = r[3].i(), d = r[4].i(), c = r[5].i();
-        // DP::newRoute(iter.first, PLANE, a, b, t, d, c);
+        DP::newRoute(iter.first, PLANE, a, b, t, d, c);
         Dijkstra::newRoute(iter.first, PLANE, a, b, t, d, c);
     }
 

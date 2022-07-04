@@ -92,16 +92,20 @@ Status API::newCity(std::string name) {
     if (API::getCityId(name) != -1) return ERR_VALUE;
     // generate a new unique id for city
     int id = newId(0);
+    // call
+    if (!(Dijkstra::newCity(id)==OK && DP::newCity(id)==OK)) return ERR;
     // add city
     city_list[id] = name;
     API::saveFile(DATA_PATH "city.json", city_list);
     // call
-    return Dijkstra::newCity(id)==OK /* && DP::newCity(id)==OK */ ? OK : ERR;
+    return OK;
 }
 
 Status API::delCity(int id) {
     // check if city exists
     if (!city_list.count(id)) return ERR_VALUE;
+    // call
+    if (!(Dijkstra::delCity(id)==OK && DP::delCity(id)==OK)) return ERR;
     // delete related routes
     std::map<int, std::string> tmp;
     tmp = train_list;
@@ -119,14 +123,13 @@ Status API::delCity(int id) {
     // delete city
     city_list.erase(id);
     API::saveFile(DATA_PATH "city.json", city_list);
-    // call
-    return Dijkstra::delCity(id)==OK /* && DP::delCity(id)==OK */ ? OK : ERR;
+    return OK;
 }
 
 Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c) {
     // assert a & b are existing city id
     if (city_list.find(a) == city_list.end() || city_list.find(b) == city_list.end())
-            return ERR_ASSERTION;
+        return ERR_ASSERTION;
     ROUTE_TYPE route_type;
     std::stringstream buffer;
     d -= t;  // caculate duration
@@ -134,42 +137,39 @@ Status API::newRoute(std::string name, int tp, int a, int b, int t, int d, int c
     int id;
     switch(tp) {
     case TRAIN:
-        route_type = TRAIN;
         id = newId(1);
+        if (!(Dijkstra::newRoute(id, PLANE, a, b, t, d, c)==OK && DP::newRoute(id, PLANE, a, b, t, d, c)==OK)) return ERR;
         train_list[id] = buffer.str();
         API::saveFile(DATA_PATH "train.json", train_list);
         break;
     case PLANE:
-        route_type = PLANE;
         id = newId(2);
+        if (!(Dijkstra::newRoute(id, PLANE, a, b, t, d, c)==OK && DP::newRoute(id, PLANE, a, b, t, d, c)==OK)) return ERR;
         plane_list[id] = buffer.str();
         API::saveFile(DATA_PATH "plane.json", plane_list);
         break;
     default: return ERR_VALUE;
     }
-    // call
-    return Dijkstra::newRoute(id, route_type, a, b, t, d, c)==OK /* && DP::newRoute(id, route_type, a, b, t, d, c)==OK */ ? OK : ERR;
+    return OK;
 }
 
 Status API::delRoute(int id, int tp) {
-    ROUTE_TYPE route_type;
     switch(tp) {
     case TRAIN:
-        route_type = TRAIN;
         if (!train_list.count(id)) return ERR_VALUE;
+        if (!(Dijkstra::delRoute(id, TRAIN)==OK && DP::delRoute(id, TRAIN)==OK)) return ERR;
         train_list.erase(id);
         API::saveFile(DATA_PATH "train.json", train_list);
         break;
     case PLANE:
-        route_type = PLANE;
         if (!plane_list.count(id)) return ERR_VALUE;
+        if (!(Dijkstra::delRoute(id, PLANE)==OK && DP::delRoute(id, PLANE)==OK)) return ERR;
         plane_list.erase(id);
         API::saveFile(DATA_PATH "plane.json", plane_list);
         break;
     default: return ERR_VALUE;
     }
-    // call
-    return Dijkstra::delRoute(id, route_type)==OK /* && DP::delRoute(id, route_type)==OK */ ? OK : ERR;
+    return OK;
 }
 
 std::vector<int> API::search(int a, int b, int r, int p) {
@@ -188,7 +188,7 @@ std::vector<int> API::search(int a, int b, int r, int p) {
     default: return {-1};
     }
     switch (algorithm) {
-    // case ALGO_DP: return DP::search(a, b, route_type, policy);
+    case ALGO_DP: return DP::search(a, b, route_type, policy);
     case ALGO_DIJK: return Dijkstra::search(a, b, route_type, policy);
     }
     return {-1};
