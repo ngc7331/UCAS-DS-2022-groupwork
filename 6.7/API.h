@@ -5,7 +5,7 @@ using namespace std;
 #define VAL_RANGE 100
 #define PRIORITY_NUM 5
 
-int valNumber; //number of values in a record
+extern int valNumber; //number of values in a record
 
 struct Record
 {
@@ -31,6 +31,4 @@ namespace MSD
     //args: Recoord record array
     //args: int length of record array
     void internalSort(Record*, int);
-
-    // MSD并不能使用分配和收集的算法，所以只使用内部排序
 }
