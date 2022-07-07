@@ -14,7 +14,7 @@ struct Edge
     int cost;
     
     Edge() {}
-    Edge(int _id, int _s, int _t, int _sTime, int _tTime, int _cost) : id(id), s(_s), t(_t), sTime(_sTime), tTime(_tTime), cost(_cost) {}
+    Edge(int _id, int _s, int _t, int _sTime, int _tTime, int _cost) : id(_id), s(_s), t(_t), sTime(_sTime), tTime(_tTime), cost(_cost) {}
 };
 bool operator<(Edge a, Edge b) { return a.tTime == b.tTime ? a.tTime < b.tTime : a.id < b.id; }
 set <Edge> edge[2];
@@ -40,21 +40,21 @@ bool operator<(State a, State b) { return a.arr < b.arr; }
 vector <State> f[MAX_CITY];
 bool exis[MAX_CITY];
 
-Status newCity(int x)
+Status DP :: newCity(int x)
 {
     if (exis[x]) return ERR_VALUE;
     exis[x] = 1;
     return OK;
 }
 
-Status delCity(int x)
+Status DP :: delCity(int x)
 {
     if (!exis[x]) return ERR_VALUE;
     exis[x] = 0;
     return OK;
 }
 
-Status newRoute(int id, ROUTE_TYPE type, int s, int t, int sTime, int duration, int cost)
+Status DP :: newRoute(int id, ROUTE_TYPE type, int s, int t, int sTime, int duration, int cost)
 {
     Edge tmp = Edge(id, s, t, sTime, sTime + duration, cost);
     if (edge[type].find(tmp) != edge[type].end()) return ERR_VALUE;
@@ -63,7 +63,7 @@ Status newRoute(int id, ROUTE_TYPE type, int s, int t, int sTime, int duration, 
     return OK;
 }
 
-Status delRoute(int id, ROUTE_TYPE type) //maybe need some more information
+Status DP :: delRoute(int id, ROUTE_TYPE type)
 {
     Edge tmp = Edge(id, 0, 0, 0, tTime[id], 0);
     if (edge[type].find(tmp) != edge[type].end()) return ERR_VALUE;
@@ -80,7 +80,7 @@ void getRoute(int x, int index, int S)
     sequence.push_back(x);
 }
 
-vector <int> search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
+vector <int> DP :: search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
 {
     for (auto i : edge[routeType])
         f[i.t].clear();
@@ -89,13 +89,42 @@ vector <int> search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
 
     for (auto i : edge[routeType])
     {
-        int index = upper_bound(f[i.s].begin(), f[i.s].end(), make_pair(ArrEdge(0, i.sTime), 0)) - f[i.s].begin();
-        int cost = f[i.s][index].cost;
-        auto last = f[i.t].end() - 1;
-        if (cost < last->cost)
-            f[i.t].push_back(State(ArrEdge(i.id, i.tTime), cost, i.s, index));
+        int index = upper_bound(f[i.s].begin(), f[i.s].end(), State(ArrEdge(0, i.sTime), 0, 0, 0)) - f[i.s].begin() - 1;
+        if (index < 0 || f[i.s][index].arr.tTime > i.sTime) continue;
+        int cost = f[i.s][index].cost + i.cost;
+        if (f[i.t].empty()) f[i.t].push_back(State(ArrEdge(i.id, i.tTime), cost, i.s, index));
+        else
+        {
+            auto last = f[i.t].end() - 1;
+            if (cost < last->cost)
+                f[i.t].push_back(State(ArrEdge(i.id, i.tTime), cost, i.s, index));
+        }
     }
 
     sequence.clear();
     getRoute(T, f[T].size() - 1, S);
+    return sequence;
 }
+
+#define debug
+
+#ifdef debug
+int main()
+{
+    int n, m;
+    scanf("%d %d", &n, &m);
+    for (int i = 1; i <= m; ++ i)
+    {
+        int s, t, sTime, duration, cost;
+        scanf("%d %d %d %d %d", &s, &t, &sTime, &duration, &cost);
+        newRoute(i, PLANE, s, t, sTime, duration, cost);
+    }
+    int S, T;
+    scanf("%d %d", &S, &T);
+    vector <int> result = search(S, T, PLANE, COST);
+    // for (auto i : result)
+    //     printf("%d\n", i);
+    auto res = f[T].end() - 1;
+    printf("%d\n", res->cost);
+}
+#endif
