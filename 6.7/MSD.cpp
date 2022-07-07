@@ -14,7 +14,7 @@ extern bool DEBUGMODE;
 //考虑实际情况，同时使用优化的和简单的排序策略：
 //在依据key0, key1两个关键字时，使用非递归的归并排序，因为此时需要排序的人数比较多
 //而依据key2, key3, key4排序时，使用直接插入排序，因为此时待排序的人数比较少
-
+bool isSameBefore(Record *ARR, const int a, const int b, const int priority);
 int debugLen = 13;
 Record debugArr[1000];
 
@@ -110,9 +110,9 @@ void MSDSort(Record *ARR, const int Priority, const int L, const int R)
 // args: int length of record array
 void MSD::internalSort(Record *ARR, const int ArrLen)
 {
-    DEBUGMODE = true;
+    DEBUGMODE = false;
     DEBUG(std::cout << "internalSort() called \n";)
-    std::cout << "internalSort() called \n";
+
     int priority = 0;
     MSDSort(ARR, priority, 0, ArrLen - 1);
 
@@ -121,7 +121,7 @@ void MSD::internalSort(Record *ARR, const int ArrLen)
         int i = 1;
         while (i < ArrLen){
             int len = 0;
-            while (ARR[i - 1].val[priority] == ARR[i].val[priority])
+            while (isSameBefore(ARR, i - 1, i, priority))
             {
                 len++;
                 i++;
@@ -133,25 +133,10 @@ void MSD::internalSort(Record *ARR, const int ArrLen)
         }
 }
 
-// int main()
-// {
-//     debugArr[0] = {53, 2, 3, 5, 1};
-//     debugArr[1] = {35, 2, 3, 4, 2};
-//     debugArr[2] = {73, 2, 3, 3, 3};
-//     debugArr[3] = {56, 2, 3, 2, 4};
-//     debugArr[4] = {53, 2, 3, 1, 5};
-//     debugArr[5] = {98, 3, 1, 5, 1};
-//     debugArr[6] = {22, 3, 2, 4, 1};
-//     debugArr[7] = {70, 3, 3, 3, 1};
-//     debugArr[8] = {2, 3, 4, 2, 1};
-//     debugArr[9] = {2, 3, 5, 1, 1};
-//     debugArr[10] = {3, 4, 5, 1, 2};
-//     debugArr[11] = {4, 5, 1, 2, 3};
-//     debugArr[12] = {5, 1, 2, 3, 4};
-//     MSD::internalSort(debugArr, debugLen);
-//     for (int i = 0; i < debugLen; i++)
-//     {
-//         std::cout << debugArr[i].val[0] << " " << debugArr[i].val[1] << " " << debugArr[i].val[2] << " " << debugArr[i].val[3] << " " << debugArr[i].val[4] << std::endl;
-//     }
-//     return 0;
-// }
+bool isSameBefore(Record *ARR, const int a, const int b, const int priority)
+{
+    for (int i = 0; i <= priority; i++)
+        if (ARR[a].val[i] != ARR[b].val[i])
+            return false;
+    return true;
+}
