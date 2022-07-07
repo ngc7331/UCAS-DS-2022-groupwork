@@ -48,9 +48,16 @@ $ ./b2 install
 1. 从官方仓库 [release](https://github.com/CrowCpp/Crow/releases) 下载`.deb`安装包
 2. 使用`dpkg`安装
 ```
-$ wget https://github.com/CrowCpp/Crow/releases/download/v1.0%2B3/crow-v1.0+3.deb
-$ sudo dpkg -i crow-v1.0+3.deb
+$ wget https://github.com/CrowCpp/Crow/releases/download/v1.0%2B4/crow-v1.0+4.deb
+$ sudo dpkg -i crow-v1.0+4.deb
 ```
+
+### 版本信息
+测试使用的版本如下：
+- g++ (Ubuntu 11.2.0-19ubuntu1) 11.2.0
+- crow 1.0+4
+- boost 1.79.0
+
 
 ## 运行说明
 ```
