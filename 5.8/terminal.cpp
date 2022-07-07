@@ -148,7 +148,7 @@ void Terminal::printMenu() {
         cout << "4. 删除城市" << endl;
         cout << "5. 删除火车车次" << endl;
         cout << "6. 删除飞机航班" << endl;
-        cout << "8. 开/关调试信息" << endl;
+        cout << "8. " << (DEBUGMODE?"关闭":"开启") <<"调试信息" << endl;
         cout << "9. 返回用户模式" << endl;
         cout << "0. 退出" << endl;
         cout << endl;
@@ -159,7 +159,7 @@ void Terminal::printMenu() {
         cout << "2. 显示城市" << endl;
         cout << "3. 显示火车车次" << endl;
         cout << "4. 显示飞机航班" << endl;
-        cout << "8. 切换搜索算法" << endl;
+        cout << "8. 切换搜索算法\t当前算法：" << (algorithm==ALGO_DP?"动态规划":"Dijkstra") << endl;
         cout << "9. 进入管理模式" << endl;
         cout << "0. 退出" << endl;
         cout << endl;
