@@ -38,7 +38,7 @@ void collect(List f[], List e[], Record *arr, int len) {
     }
 }
 
-void LSD::internalSort(Record *arr, int len) {
+void LSD::radixSort(Record *arr, int len) {
     List f[VAL_RANGE+1], e[VAL_RANGE+1];
     for (int k=PRIORITY_NUM-1; k>=0; k--) {
         for (int i=0; i<VAL_RANGE+1; i++)
@@ -46,6 +46,10 @@ void LSD::internalSort(Record *arr, int len) {
         allocate(f, e, arr, len, priority[k]);
         collect(f, e, arr, len);
     }
+}
+
+void LSD::internalSort(Record *arr, int len) {
+    // TODO
 }
 
 // test
