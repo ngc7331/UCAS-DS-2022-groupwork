@@ -23,9 +23,7 @@ int main()
     {
         int tmp[5];
         for (int j = 0; j < valNumber; ++ j)
-            scanf("%d", &tmp[j]);
-        for (int j = 0; j < valNumber; ++ j)
-            record[i].val[j] = tmp[priority[j]];
+            scanf("%d", &record[i].val[priority[j]]);
     }
     if (tp == 1) LSD :: internalSort(record, len);
     else if (tp == 2) LSD :: radixSort(record, len);
@@ -34,7 +32,7 @@ int main()
     {
         int tmp[5];
         for (int j = 0; j < valNumber; ++ j)
-            tmp[priority[j]] = record[i].val[j];
+            tmp[j] = record[i].val[priority[j]];
         for (int j = 0; j < valNumber; ++ j)
             printf("%d ", tmp[j]);
         printf("\n");
