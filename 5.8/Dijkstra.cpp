@@ -1,9 +1,8 @@
 #include "API.h"
+#include "const.h"
 #include <queue>
 #include <iostream>
 using namespace Dijkstra;
-
-#define MAXWEIGHT 0XFFFF
 
 extern bool DEBUGMODE;
 #define DEBUG(expr) if(DEBUGMODE) {expr}

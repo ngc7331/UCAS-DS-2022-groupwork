@@ -3,11 +3,12 @@
 
 #include <crow/app.h>
 #include <string>
+#include "const.h"
 #include "type.h"
 
 class Server {
     private:
-        unsigned PORT=8080;
+        unsigned PORT = DEFAULT_PORT;
         crow::SimpleApp app;
         static crow::response respond(Status, std::string, std::string, std::string);
     public:
