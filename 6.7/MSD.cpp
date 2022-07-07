@@ -2,6 +2,7 @@
 #include<iostream>
 
 extern bool DEBUGMODE;
+// bool DEBUGMODE;
 
 #define DEBUG(expr) \
     if (DEBUGMODE)  \
@@ -14,8 +15,8 @@ extern bool DEBUGMODE;
 //在依据key0, key1两个关键字时，使用非递归的归并排序，因为此时需要排序的人数比较多
 //而依据key2, key3, key4排序时，使用直接插入排序，因为此时待排序的人数比较少
 
-// int debugLen = 13;
-// Record debugArr[1000];
+int debugLen = 13;
+Record debugArr[1000];
 
 void Merge(Record *ARR, const int Priority, const int L, const int M, const int R)
 {
@@ -75,28 +76,28 @@ void MergeSort(Record *ARR, const int Priority, const int L, const int R)
 
 void SimpleSelectSort(Record *ARR, const int Priority, const int L, const int R)
 {
-    DEBUG(std::cout << "SimpleSelectSort() called with  Priority " << Priority << std::endl;)
+    DEBUG(std::cout << "SimpleSelectSort() called: Priority = " << Priority << ", L = " << L <<", R = "<<R<< std::endl;)
 
     for (int i = L; i <= R; i++)
     {
-        int maxIndex = i;
-        int maxKey = ARR[maxIndex].val[Priority];
+        int minIndex = i;
+        int minKey = ARR[minIndex].val[Priority];
         for (int k = i + 1; k <= R; k++){
-            if (ARR[k].val[Priority] > maxKey)
+            if (ARR[k].val[Priority] < minKey)
             {
-                maxKey = ARR[k].val[Priority];
-                maxIndex = k;
+                minKey = ARR[k].val[Priority];
+                minIndex = k;
             }
         }
         Record tmp = ARR[i];
-        ARR[i] = ARR[maxIndex];
-        ARR[maxIndex] = tmp;
+        ARR[i] = ARR[minIndex];
+        ARR[minIndex] = tmp;
     }
 }
 
 void MSDSort(Record *ARR, const int Priority, const int L, const int R)
 {
-    if (Priority < 2)
+    if (Priority < 0)
         MergeSort(ARR, Priority, L, R);
     else if (Priority < PRIORITY_NUM)
         SimpleSelectSort(ARR, Priority, L, R);
@@ -109,9 +110,9 @@ void MSDSort(Record *ARR, const int Priority, const int L, const int R)
 // args: int length of record array
 void MSD::internalSort(Record *ARR, const int ArrLen)
 {
-    DEBUGMODE = false;
+    DEBUGMODE = true;
     DEBUG(std::cout << "internalSort() called \n";)
-
+    std::cout << "internalSort() called \n";
     int priority = 0;
     MSDSort(ARR, priority, 0, ArrLen - 1);
 
@@ -134,14 +135,14 @@ void MSD::internalSort(Record *ARR, const int ArrLen)
 
 // int main()
 // {
-//     debugArr[0] = {1, 2, 3, 5, 1};
-//     debugArr[1] = {1, 2, 3, 4, 2};
-//     debugArr[2] = {1, 2, 3, 3, 3};
-//     debugArr[3] = {1, 2, 3, 2, 4};
-//     debugArr[4] = {1, 2, 3, 1, 5};
-//     debugArr[5] = {2, 3, 1, 5, 1};
-//     debugArr[6] = {2, 3, 2, 4, 1};
-//     debugArr[7] = {2, 3, 3, 3, 1};
+//     debugArr[0] = {53, 2, 3, 5, 1};
+//     debugArr[1] = {35, 2, 3, 4, 2};
+//     debugArr[2] = {73, 2, 3, 3, 3};
+//     debugArr[3] = {56, 2, 3, 2, 4};
+//     debugArr[4] = {53, 2, 3, 1, 5};
+//     debugArr[5] = {98, 3, 1, 5, 1};
+//     debugArr[6] = {22, 3, 2, 4, 1};
+//     debugArr[7] = {70, 3, 3, 3, 1};
 //     debugArr[8] = {2, 3, 4, 2, 1};
 //     debugArr[9] = {2, 3, 5, 1, 1};
 //     debugArr[10] = {3, 4, 5, 1, 2};
