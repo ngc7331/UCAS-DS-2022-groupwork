@@ -8,16 +8,16 @@ int random(int l, int r) { return rand() % (r - l + 1) + l; }
 
 int main()
 {
-    FILE *city = fopen("city.json", "w");
+    //FILE *city = fopen("city.json", "w");
     FILE *plane = fopen("plane.json", "w");
     FILE *train = fopen("train.json", "w");
 
-    int n = 10;
-    fprintf(city, "{\n");
-    for (int i = 1; i <= n - 1; ++ i)
-        fprintf(city, "\t\"%d\": \"%d\",\n", i, i);
-    fprintf(city, "\t\"%d\": \"%d\"\n", n, n);
-    fprintf(city, "}\n");
+    int n = 24;
+    // fprintf(city, "{\n");
+    // for (int i = 1; i <= n - 1; ++ i)
+    //     fprintf(city, "\t\"%d\": \"%d\",\n", i, i);
+    // fprintf(city, "\t\"%d\": \"%d\"\n", n, n);
+    // fprintf(city, "}\n");
 
     int m1 = 20, planeTime = 180;
     fprintf(plane, "{\n");
@@ -26,7 +26,7 @@ int main()
         int sTime = random(1, 1440);
         int s = random(1, n), t = random(1, n);
         while (s == t) t = random(1, n);
-        fprintf(plane, "\t\"%d\": [\"%d\",%d,%d,%d,%d]", i, i, s, t, sTime, random(1, planeTime));
+        fprintf(plane, "    \"%d\": [\"%d\",%d,%d,%d,%d,%d]", i, i, s, t, sTime, random(1, planeTime), random(1, 2000));
         if (i != m1) fputc(',', plane);
         fputc('\n', plane);
     }
