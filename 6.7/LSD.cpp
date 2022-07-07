@@ -28,10 +28,13 @@ void allocate(List f[], List e[], Record *arr, int len, int key) {
 }
 
 void collect(List f[], List e[], Record *arr, int len) {
+    List tmp;
     for (int i=0, l=0; i<VAL_RANGE+1 && l<len; i++) {
         while (f[i]) {
             arr[l++] = f[i]->data;
+            tmp = f[i];
             f[i] = f[i]->next;
+            free(tmp);
         }
     }
 }
@@ -46,8 +49,34 @@ void LSD::radixSort(Record *arr, int len) {
     }
 }
 
+void mergeSort(Record *arr, int l, int r, int k) {
+    if (r <= l) return ;
+    int m = (l + r) / 2, mm = m + 1, ll = l;
+    mergeSort(arr, l, m, k);
+    mergeSort(arr, mm, r, k);
+    // merge
+    Record tmp[r-l+1];
+    int i=0;
+    while (ll <= m && mm <= r) {
+        if (arr[ll].val[k] <= arr[mm].val[k])
+            tmp[i++] = arr[ll++];
+        else
+            tmp[i++] = arr[mm++];
+    }
+    // copy remaining
+    while (ll <= m)
+        tmp[i++] = arr[ll++];
+    while (mm <= r) {
+        tmp[i++] = arr[mm++];
+    }
+    // write back
+    for (int j=l, i=0; j<=r; i++, j++)
+        arr[j] = tmp[i];
+}
+
 void LSD::internalSort(Record *arr, int len) {
-    // TODO
+    for (int k=PRIORITY_NUM-1; k>=0; k--)
+        mergeSort(arr, 0, len-1, k);
 }
 
 // test
@@ -68,7 +97,7 @@ int main() {
     arr[10] = {3, 4, 5, 1, 2};
     arr[11] = {4, 5, 1, 2, 3};
     arr[12] = {5, 1, 2, 3, 4};
-    LSD::radixSort(arr, len);
+    LSD::internalSort(arr, len);
     for (int i=0; i<len; i++) {
         std::cout << arr[i].val[0] << " " << arr[i].val[1] << " " << arr[i].val[2] << " " << arr[i].val[3] << " " << arr[i].val[4] << std::endl;
     }
