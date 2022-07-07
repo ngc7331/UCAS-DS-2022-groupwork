@@ -4,3 +4,4 @@ a.out
 test.*
 .vscode/
 data_gen
+main
