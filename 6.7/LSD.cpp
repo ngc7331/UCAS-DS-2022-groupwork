@@ -3,8 +3,6 @@
 
 using namespace LSD;
 
-extern int priority[5];
-
 typedef struct __node {
     Record data;
     struct __node *next;
@@ -43,7 +41,7 @@ void LSD::radixSort(Record *arr, int len) {
     for (int k=PRIORITY_NUM-1; k>=0; k--) {
         for (int i=0; i<VAL_RANGE+1; i++)
             f[i] = e[i] = NULL;
-        allocate(f, e, arr, len, priority[k]);
+        allocate(f, e, arr, len, k);
         collect(f, e, arr, len);
     }
 }
@@ -70,12 +68,7 @@ int main() {
     arr[10] = {3, 4, 5, 1, 2};
     arr[11] = {4, 5, 1, 2, 3};
     arr[12] = {5, 1, 2, 3, 4};
-    priority[0] = 0;
-    priority[1] = 4;
-    priority[2] = 2;
-    priority[3] = 1;
-    priority[4] = 3;
-    LSD::internalSort(arr, len);
+    LSD::radixSort(arr, len);
     for (int i=0; i<len; i++) {
         std::cout << arr[i].val[0] << " " << arr[i].val[1] << " " << arr[i].val[2] << " " << arr[i].val[3] << " " << arr[i].val[4] << std::endl;
     }
