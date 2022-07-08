@@ -6,6 +6,7 @@
 
 #define MAX_CITY 100000
 #define MAXWEIGHT 0XFFFF
+#define INF 1000000000
 
 #define DEFAULT_PORT 8080
 
