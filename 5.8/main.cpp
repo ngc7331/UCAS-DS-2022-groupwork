@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     EXE_NAME = *argv;
     enum {TERMINAL, SERVER} intr_mode = TERMINAL;
     Server server;
-    algorithm = ALGO_DIJK;
+    algorithm = ALGO_DP;
     DEBUGMODE = false;
 
     // arg parse
