@@ -20,7 +20,7 @@ struct Edge
     Edge() {}
     Edge(int _id, int _s, int _t, int _sTime, int _tTime, int _cost) : id(_id), s(_s), t(_t), sTime(_sTime), tTime(_tTime), cost(_cost) {}
 };
-bool operator<(Edge a, Edge b) { return a.tTime == b.tTime ? a.tTime < b.tTime : a.id < b.id; }
+bool operator<(Edge a, Edge b) { return a.tTime != b.tTime ? a.tTime < b.tTime : a.id < b.id; }
 set <Edge> edge[2];
 int tTime[MAX_CITY];
 
@@ -31,7 +31,7 @@ struct ArrEdge
     ArrEdge() {}
     ArrEdge(int _id, int _tTime) : id(_id), tTime(_tTime) {}
 };
-bool operator<(ArrEdge a, ArrEdge b) { return a.tTime == b.tTime ? a.tTime < b.tTime : a.id < b.id; }
+bool operator<(ArrEdge a, ArrEdge b) { return a.tTime != b.tTime ? a.tTime < b.tTime : a.id < b.id; }
 struct State
 {
     ArrEdge arr;
@@ -98,14 +98,18 @@ void work(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
         if (index < 0 || f[i.s][index].arr.tTime > i.sTime) continue;
         int cost = f[i.s][index].cost;
         if (policyType == COST) cost += i.cost;
-#ifndef debug
         else
         {
             ++ cost;
-            for (int tmp = index; tmp && f[i.s][tmp].arr.tTime == i.sTime; -- tmp)
-                if (isSameTrain(f[i.s][tmp].arr.id, i.id)) cost = min(cost, f[i.s][tmp].cost);
+            for (int tmp = index; tmp >= 0 && f[i.s][tmp].arr.tTime >= i.sTime - 25; -- tmp)
+            {
+                if (isSameTrain(f[i.s][tmp].arr.id, i.id) && f[i.s][tmp].cost < cost)
+                {
+                    cost = f[i.s][tmp].cost;
+                    index = tmp;
+                }
+            }
         }
-#endif
         if (f[i.t].empty()) f[i.t].push_back(State(ArrEdge(i.id, i.tTime), cost, i.s, index));
         else
         {
@@ -168,7 +172,7 @@ int main()
     }
     int S, T;
     scanf("%d %d", &S, &T);
-    vector <int> result = search(S, T, PLANE, TIME);
+    vector <int> result = search(S, T, PLANE, INTERCHANGE);
     for (auto i : result)
         printf("%d\n", i);
 }
