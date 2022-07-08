@@ -217,6 +217,8 @@ std::vector<int> Dijkstra::search(int startCityID, int endCityID, ROUTE_TYPE rou
     RouteInfo null;                     //用于填充第一个route，无意义
     null.startCityIndex = null.endCityIndex = startCityID;
     null.cost = null.startTime = null.endTime = 0;
+    null.routeType = routeType;
+    null.routeID = -1;
     q.push(std::make_pair(minCost[startCityID], null)); //将起始点放入堆
     while (!q.empty())
     {
