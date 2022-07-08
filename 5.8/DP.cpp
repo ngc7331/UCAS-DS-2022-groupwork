@@ -8,8 +8,6 @@ using namespace DP;
 using namespace std;
 using API :: isSameTrain;
 
-#define debug
-
 const int INF = 1e9;
 
 struct Edge
