@@ -1,10 +1,16 @@
 #include <set>
 #include <vector>
 #include <algorithm>
+#include <unordered_set>
 #include "API.h"
 #include "const.h"
 using namespace DP;
 using namespace std;
+using API :: isSameTrain;
+
+#define debug
+
+const int INF = 1e9;
 
 struct Edge
 {
@@ -38,19 +44,19 @@ struct State
 };
 bool operator<(State a, State b) { return a.arr < b.arr; }
 vector <State> f[MAX_CITY];
-bool exis[MAX_CITY];
+unordered_set <int> city;
 
 Status DP :: newCity(int x)
 {
-    if (exis[x]) return ERR_VALUE;
-    exis[x] = 1;
+    if (city.find(x) != city.end()) return ERR_VALUE;
+    city.insert(x);
     return OK;
 }
 
 Status DP :: delCity(int x)
 {
-    if (!exis[x]) return ERR_VALUE;
-    exis[x] = 0;
+    if (city.find(x) == city.end()) return ERR_VALUE;
+    city.erase(x);
     return OK;
 }
 
@@ -75,23 +81,33 @@ vector <int> sequence;
 
 void getRoute(int x, int index, int S)
 {
-    if (x != S)
-        getRoute(f[x][index].pre, f[x][index].index, S);
-    sequence.push_back(x);
+    if (x == S) return;
+    getRoute(f[x][index].pre, f[x][index].index, S);
+    sequence.push_back(f[x][index].arr.id);
 }
 
-vector <int> DP :: search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
+void clear()
 {
-    for (auto i : edge[routeType])
-        f[i.t].clear();
+    for (auto i : city)
+        f[i].clear();
+}
 
-    f[S].push_back(State(ArrEdge(0, 0), 0, 0, 0));
-
+void work(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
+{
     for (auto i : edge[routeType])
     {
         int index = upper_bound(f[i.s].begin(), f[i.s].end(), State(ArrEdge(0, i.sTime), 0, 0, 0)) - f[i.s].begin() - 1;
         if (index < 0 || f[i.s][index].arr.tTime > i.sTime) continue;
-        int cost = f[i.s][index].cost + i.cost;
+        int cost = f[i.s][index].cost;
+        if (policyType == COST) cost += i.cost;
+#ifndef debug
+        else
+        {
+            ++ cost;
+            for (int tmp = index; tmp && f[i.s][tmp].arr.tTime == i.sTime; -- tmp)
+                if (isSameTrain(f[i.s][tmp].arr.id, i.id)) cost = min(cost, f[i.s][tmp].cost);
+        }
+#endif
         if (f[i.t].empty()) f[i.t].push_back(State(ArrEdge(i.id, i.tTime), cost, i.s, index));
         else
         {
@@ -100,13 +116,46 @@ vector <int> DP :: search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policy
                 f[i.t].push_back(State(ArrEdge(i.id, i.tTime), cost, i.s, index));
         }
     }
-
-    sequence.clear();
-    getRoute(T, f[T].size() - 1, S);
-    return sequence;
 }
 
-#define debug
+vector <int> DP :: search(int S, int T, ROUTE_TYPE routeType, POLICY_TYPE policyType)
+{
+    if (policyType == TIME)
+    {
+        int time = INF, cost = INF;
+        for (auto i : edge[routeType])
+        {
+            if (i.s == S)
+            {
+                clear();
+                f[S].push_back(State(ArrEdge(0, i.sTime), 0, 0, 0));
+                work(S, T, routeType, COST);
+
+                if (f[T].empty()) continue;
+                int tmp = 0;
+                while (tmp + 1 <f[T].size() && f[T][tmp + 1].arr.tTime == f[T][0].arr.tTime) ++ tmp;
+                if (f[T][tmp].arr.tTime - i.sTime < time || (f[T][tmp].arr.tTime - i.sTime == time && f[T][tmp].cost < cost))
+                {
+                    time = f[T][tmp].arr.tTime - i.sTime;
+                    cost = f[T][tmp].cost;
+                    sequence.clear();
+                    getRoute(T, tmp, S);
+                }
+            }
+        }
+    }
+    else
+    {
+        clear();
+        f[S].push_back(State(ArrEdge(0, 0), 0, 0, 0));
+        work(S, T, routeType, policyType);
+
+        sequence.clear();
+        if (!f[T].empty()) getRoute(T, f[T].size() - 1, S);
+    }
+
+    return sequence;
+}
 
 #ifdef debug
 int main()
@@ -121,10 +170,8 @@ int main()
     }
     int S, T;
     scanf("%d %d", &S, &T);
-    vector <int> result = search(S, T, PLANE, COST);
-    // for (auto i : result)
-    //     printf("%d\n", i);
-    auto res = f[T].end() - 1;
-    printf("%d\n", res->cost);
+    vector <int> result = search(S, T, PLANE, TIME);
+    for (auto i : result)
+        printf("%d\n", i);
 }
 #endif
