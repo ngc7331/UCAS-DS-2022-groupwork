@@ -27,6 +27,7 @@ createApp({
         app.loadData(app.city, "data/city.json");
         app.loadData(app.plane, "data/plane.json");
         app.loadData(app.train, "data/train.json");
+        this.setAlgo(this.algo);
     },
     computed: {
         new_city_id() {
@@ -124,6 +125,9 @@ createApp({
             axios.get(`api/v1/search?a=${app.search_arg[0]}&b=${app.search_arg[1]}&tp=${app.search_arg[2]}&policy=${app.search_arg[3]}`)
                 .then(response => {
                     app.copyObject(JSON.parse(response.data.data), app.result);
+                    if (response.data.msg !== '') {
+                        swal({title: "Note", text: response.data.msg, icon: "info", timer: 5000});
+                    }
                 })
                 .catch(function (error) { swal({title: "Error", text: error.response.data.err, icon: "error", timer: 2000}); });
         },

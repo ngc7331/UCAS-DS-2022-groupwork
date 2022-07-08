@@ -122,6 +122,8 @@ Server::Server() {
                 trip_duration += r[4].i();
                 if (i != 0) {
                     d = r[3].i() - laststart;
+                    if (d <= 0)
+                        msg = "本路径假设每天都有相同的车次，可能需要在某城市等到次日";
                     while (d <= 0) d += 1440;  // the next day
                     duration += d;
                 }

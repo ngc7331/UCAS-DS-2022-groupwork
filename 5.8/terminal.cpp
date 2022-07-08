@@ -11,7 +11,7 @@ using std::string;
 using std::endl;
 using std::cout;
 
-#define CLS system("clear")
+#define CLS if (!DEBUGMODE) system("clear");
 #define PAUSE cout << "按回车以继续"; while(getchar()!='\n');
 
 extern string EXE_NAME;
@@ -204,18 +204,17 @@ void Terminal::printResult(std::vector<int> res, int tp) {
         return ;
     }
 
-    int cost = 0, trip_duration = 0, interchange = 0;
+    int cost = 0, duration = 0, trip_duration = 0, interchange = 0;
     std::map<int, string> *list = tp==TRAIN ? &train_list : &plane_list;
-    crow::json::rvalue from = crow::json::load((*list)[res[0]]);
-    crow::json::rvalue to = crow::json::load((*list)[res[res.size()-1]]);
-    int duration = to[3].i() + to[4].i() - from[3].i();
     string lastname;
+    crow::json::rvalue r;
+    int laststart, d;
 
     cout << "=== 路线 ===" << endl;
     cout << " id |   编号   |  起点  |  终点  |    出发    |    到达    |  票价" << endl;
     cout << std::right;
     for (int i=0; i<res.size(); i++) {
-        crow::json::rvalue r = crow::json::load((*list)[res[i]]);
+        r = crow::json::load((*list)[res[i]]);
         cout << std::setw(3) << res[i] << " | ";
         cout << std::setw(8) << r[0].s() << " | ";
         cout << std::setw(8) << city_list[r[1].i()] << " | ";
@@ -224,13 +223,21 @@ void Terminal::printResult(std::vector<int> res, int tp) {
         cout << std::setw(11) << Terminal::strfTime(r[3].i() + r[4].i()) << " | ";
         cout << std::setw(6) << r[5].i() << endl;
         cost += r[5].i();
+        if (i != 0) {
+            d = r[3].i() - laststart;
+            if (d <= 0)
+                cout << "本路径假设每天都有相同的车次，可能需要在某城市等到次日" << endl;
+            while (d <= 0) d += 1440;  // the next day
+            duration += d;
+        }
         trip_duration += r[4].i();
         if (i != 0 && r[0].s() != lastname)
             interchange ++;
         lastname = r[0].s();
+        laststart = r[3].i();
     }
     cout << "共计花费:  \t" << cost << "元" << endl;
-    cout << "总时长:    \t" << duration << "分钟" << endl;
+    cout << "总时长:    \t" << duration + r[4].i() << "分钟" << endl;
     cout << "总行程时长:\t" << trip_duration << "分钟" << endl;
     cout << "总中转:    \t" << interchange << "次" << endl;
     cout << std::left << endl;
