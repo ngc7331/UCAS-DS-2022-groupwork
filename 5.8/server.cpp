@@ -111,23 +111,28 @@ Server::Server() {
             code = ERR;
         }
         else {
-            int cost = 0, trip_duration = 0, interchange = 0;
+            int cost = 0, duration = 0, trip_duration = 0, interchange = 0;
             std::map<int, std::string> *list = tp==TRAIN ? &train_list : &plane_list;
-            crow::json::rvalue from = crow::json::load((*list)[res[0]]);
-            crow::json::rvalue to = crow::json::load((*list)[res[res.size()-1]]);
-            int duration = to[3].i() + to[4].i() - from[3].i();
             std::string lastname;
+            crow::json::rvalue r;
+            int laststart, d;
             for (int i=0; i<res.size(); i++) {
-                crow::json::rvalue r = crow::json::load((*list)[res[i]]);
+                r = crow::json::load((*list)[res[i]]);
                 cost += r[5].i();
                 trip_duration += r[4].i();
+                if (i != 0) {
+                    d = r[3].i() - laststart;
+                    while (d <= 0) d += 1440;  // the next day
+                    duration += d;
+                }
                 if (i != 0 && r[0].s() != lastname)
                     interchange ++;
                 lastname = r[0].s();
+                laststart = r[3].i();
             }
             data["path"] = res;
             data["cost"] = cost;
-            data["duration"] = duration;
+            data["duration"] = duration + r[4].i();
             data["trip_duration"] = trip_duration;
             data["interchange"] = interchange;
             data["tp"] = tp;
