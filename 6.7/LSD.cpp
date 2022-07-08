@@ -5,18 +5,18 @@ using namespace LSD;
 
 typedef struct __node {
     Record data;
-    struct __node *next;
+    struct __node* next;
 } Node, *List;
 
-Node *newNode(Record data) {
-    Node *n = (Node *) malloc(sizeof(Node));
+Node* newNode(Record data) {
+    Node* n = (Node*)malloc(sizeof(Node));
     n->data = data;
     n->next = NULL;
     return n;
 }
 
-void allocate(List f[], List e[], Record *arr, int len, int key) {
-    for (int i=0; i<len; i++) {
+void allocate(List f[], List e[], Record* arr, int len, int key) {
+    for (int i = 0; i < len; i++) {
         int k = arr[i].val[key];
         if (f[k] == NULL)
             f[k] = e[k] = newNode(arr[i]);
@@ -27,9 +27,9 @@ void allocate(List f[], List e[], Record *arr, int len, int key) {
     }
 }
 
-void collect(List f[], List e[], Record *arr, int len) {
+void collect(List f[], List e[], Record* arr, int len) {
     List tmp;
-    for (int i=0, l=0; i<VAL_RANGE+1 && l<len; i++) {
+    for (int i = 0, l = 0; i < VAL_RANGE + 1 && l < len; i++) {
         while (f[i]) {
             arr[l++] = f[i]->data;
             tmp = f[i];
@@ -39,24 +39,25 @@ void collect(List f[], List e[], Record *arr, int len) {
     }
 }
 
-void LSD::radixSort(Record *arr, int len) {
-    List f[VAL_RANGE+1], e[VAL_RANGE+1];
-    for (int k=PRIORITY_NUM-1; k>=0; k--) {
-        for (int i=0; i<VAL_RANGE+1; i++)
+void LSD::radixSort(Record* arr, int len) {
+    List f[VAL_RANGE + 1], e[VAL_RANGE + 1];
+    for (int k = PRIORITY_NUM - 1; k >= 0; k--) {
+        for (int i = 0; i < VAL_RANGE + 1; i++)
             f[i] = e[i] = NULL;
         allocate(f, e, arr, len, k);
         collect(f, e, arr, len);
     }
 }
 
-void mergeSort(Record *arr, int l, int r, int k) {
-    if (r <= l) return ;
+void mergeSort(Record* arr, int l, int r, int k) {
+    if (r <= l)
+        return;
     int m = (l + r) / 2, mm = m + 1, ll = l;
     mergeSort(arr, l, m, k);
     mergeSort(arr, mm, r, k);
     // merge
-    Record tmp[r-l+1];
-    int i=0;
+    Record tmp[r - l + 1];
+    int i = 0;
     while (ll <= m && mm <= r) {
         if (arr[ll].val[k] <= arr[mm].val[k])
             tmp[i++] = arr[ll++];
@@ -70,13 +71,13 @@ void mergeSort(Record *arr, int l, int r, int k) {
         tmp[i++] = arr[mm++];
     }
     // write back
-    for (int j=l, i=0; j<=r; i++, j++)
+    for (int j = l, i = 0; j <= r; i++, j++)
         arr[j] = tmp[i];
 }
 
-void LSD::internalSort(Record *arr, int len) {
-    for (int k=PRIORITY_NUM-1; k>=0; k--)
-        mergeSort(arr, 0, len-1, k);
+void LSD::internalSort(Record* arr, int len) {
+    for (int k = PRIORITY_NUM - 1; k >= 0; k--)
+        mergeSort(arr, 0, len - 1, k);
 }
 
 // test
@@ -99,7 +100,8 @@ int main() {
     arr[12] = {5, 1, 2, 3, 4};
     LSD::internalSort(arr, len);
     for (int i=0; i<len; i++) {
-        std::cout << arr[i].val[0] << " " << arr[i].val[1] << " " << arr[i].val[2] << " " << arr[i].val[3] << " " << arr[i].val[4] << std::endl;
+        std::cout << arr[i].val[0] << " " << arr[i].val[1] << " " << arr[i].val[2] << " " <<
+arr[i].val[3] << " " << arr[i].val[4] << std::endl;
     }
     return 0;
 }
